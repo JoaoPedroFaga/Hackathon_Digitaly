@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Tabela de Usuários (Serve para Pacientes, Médicos e Admins)
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String   // Senha criptografada (hash)
+  role      Role     @default(PATIENT) // Papel do usuário
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos para consultas
+  patientAppointments Appointment[] @relation("PatientAppointments")
+  doctorAppointments  Appointment[] @relation("DoctorAppointments")
+
+  @@map("users")
+}
+
+// Tipos de usuários permitidos no sistema
+enum Role {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+// Tabela de Consultas / Agendamentos
+model Appointment {
+  id           String            @id @default(uuid())
+  date         DateTime          // Data e hora da consulta
+  status       AppointmentStatus @default(PENDING)
+  
+  // Chaves estrangeiras para ligar o Paciente e o Médico
+  patientId    String
+  patient      User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  
+  doctorId     String
+  doctor       User              @relation("DoctorAppointments", fields: [doctorId], references: [id])
+
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@map("appointments")
+}
+
+// Status possíveis de uma consulta
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
