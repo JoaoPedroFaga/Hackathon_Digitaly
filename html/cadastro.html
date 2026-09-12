@@ -257,6 +257,18 @@ form{
       >
     </div>
 
+    <div class="campo">
+      <label for="nascimento">Nascimento</label>
+      <input
+        type="text"
+        id="nascimento"
+        name="nascimento"
+        placeholder="XX/XX/XXXX"
+        maxlength="10"
+        required
+      >
+    </div>
+
     <div class="linha">
       <div class="campo">
         <label for="telefone">Número de telefone</label>
@@ -289,11 +301,40 @@ form{
       <span class="ajuda" id="ajudaSenha">Mínimo de 8 caracteres.</span>
     </div>
 
-    <div class="campo">
-      <label for="endereco">Endereço</label>
-      <input type="text" id="endereco" name="endereco" placeholder="Rua, número, bairro, cidade - UF" autocomplete="street-address" required>
-      <span class="ajuda" id="ajudaEndereco"></span>
+    <div class="linha">
+
+      <div class="campo">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
+        <span class="ajuda" id="ajudaSobrenome"></span>
+      </div>
+
+      <div class="campo">
+        <label for="estado">Estado</label>
+        <input type="text" id="estado" name="estado" placeholder="Sigla do estado" maxlength="2" required>
+        <span class="ajuda" id="ajudaNome"></span>
+      </div>
     </div>
+
+    <div class="linha">
+      <div class="campo">
+        <label for="rua">Rua</label>
+        <input type="text" id="rua" name="rua" placeholder="Rua" required>
+        <span class="ajuda" id="ajudaNome"></span>
+      </div>
+
+      <div class="campo">
+        <label for="numero">Numero</label>
+        <input type="text" id="numero" name="numero" placeholder="Numero" required>
+        <span class="ajuda" id="ajudaSobrenome"></span>
+      </div>
+    </div>
+
+    <div class="campo">
+        <label for="complemento">Complemento</label>
+        <input type="text" id="complemento" name="complemento" placeholder="Casa, apto, ponto de referência, etc.">
+        <span class="ajuda" id="ajudaNome"></span>
+      </div>
 
     <button type="submit" class="btn btn-primario">Criar conta</button>
   </form>
@@ -432,8 +473,20 @@ function formatarCPF(valor){
   return valor;
 }
 
+
+function formatarData(valor){
+  valor = valor.replace(/\D/g,'').slice(0,8);
+  valor = valor.replace(/(\d{2})(\d)/,'$1/$2');
+  valor = valor.replace(/(\d{2})(\d)/,'$1/$2');
+  return valor;
+}
+
 document.getElementById('cpf').addEventListener('input', function(){
   this.value = formatarCPF(this.value);
+});
+
+document.getElementById('nascimento').addEventListener('input', function(){
+  this.value = formatarData(this.value);
 });
 
 </script>
