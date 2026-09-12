@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar · Digitaly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --grafite-950:#0B0D10; --grafite-900:#121417; --grafite-800:#1B1E23;
+  --grafite-700:#262A31; --grafite-600:#3A3F48; --grafite-500:#5B6270;
+  --grafite-400:#7D8494; --grafite-300:#A5ACB8; --grafite-200:#CFD4DC;
+  --grafite-100:#E6E9EE; --grafite-50:#F5F7FA; --branco:#FFFFFF;
+  --celeste-700:#0069AB; --celeste-600:#0084D6; --celeste-500:#009FFF;
+  --celeste-400:#33B3FF; --celeste-300:#66C6FF;
+  --grad-marca:linear-gradient(135deg,#009FFF 0%,#4CC9FF 100%);
+  --grad-marca-profundo:linear-gradient(135deg,#0069AB 0%,#009FFF 60%,#4CC9FF 100%);
+  --fonte-display:'Inter',system-ui,sans-serif; --fonte-texto:'Inter',system-ui,sans-serif;
+  --fonte-dados:'IBM Plex Sans',system-ui,sans-serif;
+  --t-xs:12px; --t-sm:13px; --t-md:15px; --t-lg:17px; --t-3xl:32px;
+  --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px;
+  --r-md:12px; --r-lg:16px; --r-pill:999px;
+  --dur-base:200ms; --ease:cubic-bezier(.2,.8,.2,1);
+  --erro:#EF4444;
+  --glow:0 0 0 1px rgba(0,159,255,.35),0 12px 40px rgba(0,159,255,.22);
+}
+[data-theme="dark"]{
+  --bg:var(--grafite-950); --bg-elev:var(--grafite-900);
+  --borda:rgba(255,255,255,.08); --borda-forte:rgba(255,255,255,.16);
+  --texto:var(--grafite-50); --texto-2:var(--grafite-300); --texto-3:var(--grafite-500);
+  --vidro:rgba(255,255,255,.05); --vidro-borda:rgba(255,255,255,.12); --marca-texto:var(--celeste-400);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fonte-texto);font-size:var(--t-md);line-height:1.6;color:var(--texto);background:var(--bg);min-height:100vh;display:grid;place-items:center;padding:var(--s-6)}
+h1{font-family:var(--fonte-display);font-weight:100;font-size:var(--t-3xl);line-height:1.2}
+p{color:var(--texto-2)}
+a{color:var(--marca-texto);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.logo{position:fixed;top:var(--s-6);left:var(--s-6);display:flex;align-items:center;gap:8px;font-family:var(--fonte-display);font-weight:500;font-size:var(--t-lg);color:var(--texto)}
+.logo i{width:22px;height:22px;border-radius:6px;background:var(--grad-marca);display:inline-block}
+
+.painel{width:100%;max-width:400px}
+.painel .tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--fonte-dados);font-size:var(--t-xs);color:var(--texto-2);padding:6px 12px;border:1px solid var(--borda);border-radius:var(--r-pill);margin-bottom:var(--s-5)}
+.painel .tag i{width:6px;height:6px;border-radius:50%;background:var(--celeste-500);box-shadow:0 0 10px var(--celeste-500)}
+.painel h1{margin-bottom:var(--s-2)}
+.painel > p{margin-bottom:var(--s-8)}
+
+form{display:flex;flex-direction:column;gap:var(--s-5)}
+.campo{display:flex;flex-direction:column;gap:6px}
+.campo label{font-size:var(--t-sm);color:var(--texto-2)}
+.campo input{
+  height:48px;padding:0 var(--s-5);border-radius:var(--r-pill);
+  border:1px solid var(--borda-forte);background:var(--bg-elev);color:var(--texto);
+  font-family:var(--fonte-texto);font-size:var(--t-md);
+  transition:border-color var(--dur-base) var(--ease);
+}
+.campo input::placeholder{color:var(--texto-3)}
+.campo input:focus{outline:0;border-color:var(--celeste-500);box-shadow:0 0 0 3px rgba(0,159,255,.2)}
+.campo input.erro{border-color:var(--erro)}
+.campo .ajuda{font-size:var(--t-xs);color:var(--texto-3)}
+.campo .ajuda.erro{color:var(--erro)}
+
+.linha-senha{display:flex;justify-content:space-between;align-items:center}
+.linha-senha label{font-size:var(--t-sm);color:var(--texto-2)}
+.esqueci{font-size:var(--t-xs)}
+
+.btn{display:flex;align-items:center;justify-content:center;height:48px;border-radius:var(--r-pill);font-family:var(--fonte-texto);font-weight:500;font-size:var(--t-md);border:0;cursor:pointer;transition:box-shadow var(--dur-base) var(--ease)}
+.btn-primario{background:var(--grad-marca);color:#fff}
+.btn-primario:hover{box-shadow:var(--glow)}
+
+.rodape-painel{margin-top:var(--s-8);text-align:center;font-size:var(--t-sm);color:var(--texto-3)}
+</style>
+</head>
+<body>
+
+<a href="home.html" class="logo"><i></i>Digitaly</a>
+
+<div class="painel">
+  <span class="tag"><i></i>Área do médico e do paciente</span>
+  <h1>Entrar na sua conta</h1>
+  <p>Acesse suas consultas, histórico de atendimentos e a sala de teleatendimento.</p>
+
+  <form id="formLogin" novalidate>
+    <div class="campo">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" autocomplete="email" required>
+      <span class="ajuda" id="ajudaEmail"></span>
+    </div>
+
+    <div class="campo">
+      <div class="linha-senha">
+        <label for="senha">Senha</label>
+        <a href="#" class="esqueci">Esqueci minha senha</a>
+      </div>
+      <input type="password" id="senha" name="senha" placeholder="Digite sua senha" autocomplete="current-password" required>
+      <span class="ajuda" id="ajudaSenha"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primario">Entrar</button>
+  </form>
+
+  <p class="rodape-painel">Ainda não tem conta? <a href="cadastro.html">Criar conta</a></p>
+</div>
+
+<script>
+document.getElementById('formLogin').addEventListener('submit', function(e){
+  e.preventDefault();
+  const email = document.getElementById('email');
+  const senha = document.getElementById('senha');
+  const ajudaEmail = document.getElementById('ajudaEmail');
+  const ajudaSenha = document.getElementById('ajudaSenha');
+  let valido = true;
+
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+  if(!emailValido){
+    email.classList.add('erro');
+    ajudaEmail.textContent = 'Digite um e-mail válido.';
+    ajudaEmail.classList.add('erro');
+    valido = false;
+  } else {
+    email.classList.remove('erro');
+    ajudaEmail.textContent = '';
+    ajudaEmail.classList.remove('erro');
+  }
+
+  if(senha.value.length < 1){
+    senha.classList.add('erro');
+    ajudaSenha.textContent = 'Digite sua senha.';
+    ajudaSenha.classList.add('erro');
+    valido = false;
+  } else {
+    senha.classList.remove('erro');
+    ajudaSenha.textContent = '';
+    ajudaSenha.classList.remove('erro');
+  }
+
+  if(valido){
+    window.location.href = 'home.html';
+  }
+});
+
+[document.getElementById('email'), document.getElementById('senha')].forEach(campo=>{
+  campo.addEventListener('input', ()=>{
+    campo.classList.remove('erro');
+    const ajuda = campo.id === 'email' ? document.getElementById('ajudaEmail') : document.getElementById('ajudaSenha');
+    ajuda.textContent = '';
+    ajuda.classList.remove('erro');
+  });
+});
+</script>
+
+</body>
+</html>

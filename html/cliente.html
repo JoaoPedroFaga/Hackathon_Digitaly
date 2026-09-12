@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Área do cliente · Digitaly</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --grafite-950:#0B0D10; --grafite-900:#121417; --grafite-800:#1B1E23;
+  --grafite-700:#262A31; --grafite-600:#3A3F48; --grafite-500:#5B6270;
+  --grafite-400:#7D8494; --grafite-300:#A5ACB8; --grafite-200:#CFD4DC;
+  --grafite-100:#E6E9EE; --grafite-50:#F5F7FA; --branco:#FFFFFF;
+  --celeste-700:#0069AB; --celeste-600:#0084D6; --celeste-500:#009FFF;
+  --celeste-400:#33B3FF; --celeste-300:#66C6FF;
+  --grad-marca:linear-gradient(135deg,#009FFF 0%,#4CC9FF 100%);
+  --fonte-display:'Inter',system-ui,sans-serif;
+  --fonte-texto:'Inter',system-ui,sans-serif;
+  --fonte-dados:'IBM Plex Sans',system-ui,sans-serif;
+  --r-md:12px; --r-lg:16px; --r-pill:999px;
+  --borda:rgba(255,255,255,.08);
+  --borda-forte:rgba(255,255,255,.16);
+  --bg:var(--grafite-950); --bg-elev:var(--grafite-900);
+  --texto:var(--grafite-50); --texto-2:var(--grafite-300); --texto-3:var(--grafite-500);
+  --marca-texto:var(--celeste-400);
+  --verde:#35D07F; --vermelho:#EF4444;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:var(--fonte-texto);
+  font-size:15px;
+  line-height:1.6;
+  color:var(--texto);
+  background:var(--bg);
+  min-height:100vh;
+}
+
+a{color:var(--marca-texto);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.logo{
+  position:fixed;
+  top:24px;
+  left:24px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--fonte-display);
+  font-weight:500;
+  font-size:17px;
+  color:var(--texto);
+  z-index:10;
+}
+.logo i{
+  width:22px;height:22px;border-radius:6px;
+  background:var(--grad-marca);display:inline-block;
+}
+
+.topo{
+  width:min(1180px, calc(100% - 48px));
+  margin:0 auto;
+  padding:34px 0 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:20px;
+}
+
+.topo-esquerda .tag{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--fonte-dados);
+  font-size:12px;
+  color:var(--texto-2);
+  padding:6px 12px;
+  border:1px solid var(--borda);
+  border-radius:var(--r-pill);
+  margin-bottom:14px;
+}
+.tag i{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--celeste-500);
+  box-shadow:0 0 10px var(--celeste-500);
+}
+h1{
+  font-family:var(--fonte-display);
+  font-weight:100;
+  font-size:32px;
+  line-height:1.2;
+}
+.subtitulo{color:var(--texto-2);margin-top:7px}
+
+.btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+  padding:0 20px;
+  border-radius:var(--r-pill);
+  font-family:var(--fonte-texto);
+  font-weight:500;
+  font-size:14px;
+  border:0;
+  cursor:pointer;
+  transition:.2s ease;
+}
+.btn-primario{
+  background:var(--grad-marca);
+  color:#fff;
+}
+.btn-primario:hover{
+  box-shadow:0 0 0 1px rgba(0,159,255,.35),0 12px 40px rgba(0,159,255,.22);
+  text-decoration:none;
+}
+.btn-secundario{
+  background:var(--grafite-800);
+  color:var(--texto);
+  border:1px solid var(--borda-forte);
+}
+.btn-secundario:hover{border-color:var(--celeste-500);text-decoration:none}
+
+.conteudo{
+  width:min(1180px, calc(100% - 48px));
+  margin:0 auto;
+  padding-bottom:40px;
+  display:grid;
+  grid-template-columns:minmax(0, 1.65fr) minmax(300px, .9fr);
+  gap:20px;
+}
+
+.card{
+  background:var(--bg-elev);
+  border:1px solid var(--borda);
+  border-radius:var(--r-lg);
+  padding:22px;
+}
+
+.card-titulo{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+.card-titulo h2{
+  font-size:18px;
+  font-weight:500;
+}
+.card-titulo p{
+  color:var(--texto-3);
+  font-size:13px;
+  margin-top:2px;
+}
+
+/* Calendário */
+.calendario-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+}
+.mes{
+  font-family:var(--fonte-dados);
+  font-size:14px;
+  color:var(--texto-2);
+  text-transform:capitalize;
+}
+.seta{
+  width:34px;height:34px;
+  border-radius:50%;
+  border:1px solid var(--borda);
+  background:var(--grafite-800);
+  color:var(--texto-2);
+  cursor:pointer;
+}
+.seta:hover{border-color:var(--celeste-500);color:var(--texto)}
+
+.calendario{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:7px;
+}
+.dia-semana{
+  text-align:center;
+  color:var(--texto-3);
+  font-family:var(--fonte-dados);
+  font-size:11px;
+  padding-bottom:5px;
+}
+.dia{
+  min-height:55px;
+  border:1px solid var(--borda);
+  border-radius:10px;
+  background:rgba(255,255,255,.025);
+  padding:7px;
+  color:var(--texto-2);
+  font-family:var(--fonte-dados);
+  font-size:13px;
+  cursor:pointer;
+  text-align:left;
+}
+.dia:hover{border-color:rgba(0,159,255,.45)}
+.dia.vazio{background:transparent;border-color:transparent;cursor:default}
+.dia.hoje{
+  border-color:var(--celeste-500);
+  color:var(--texto);
+}
+.dia.consulta{
+  background:rgba(0,159,255,.12);
+  border-color:rgba(0,159,255,.45);
+  color:var(--texto);
+}
+.dia .ponto{
+  display:block;
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--celeste-400);
+  margin-top:6px;
+  box-shadow:0 0 7px rgba(0,159,255,.7);
+}
+
+.legenda{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  margin-top:14px;
+  color:var(--texto-3);
+  font-size:12px;
+}
+.legenda span{display:flex;align-items:center;gap:7px}
+.bolinha{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--celeste-400);
+}
+.bolinha.hj{border:1px solid var(--celeste-500);background:transparent}
+
+/* Consultas */
+.consultas{
+  margin-top:20px;
+}
+.consulta{
+  border:1px solid var(--borda);
+  border-radius:var(--r-md);
+  background:rgba(255,255,255,.025);
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:10px;
+}
+.consulta:last-child{margin-bottom:0}
+.consulta-info{
+  min-width:0;
+}
+.consulta-data{
+  color:var(--marca-texto);
+  font-family:var(--fonte-dados);
+  font-size:12px;
+  margin-bottom:3px;
+}
+.consulta h3{
+  font-size:15px;
+  font-weight:500;
+}
+.consulta p{
+  color:var(--texto-3);
+  font-size:12px;
+}
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  color:var(--verde);
+  margin-top:5px;
+}
+.status i{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--verde);
+}
+.teleatendimento{
+  margin-top:20px;
+  border:1px solid rgba(53,208,127,.18);
+  background:rgba(53,208,127,.045);
+  border-radius:var(--r-lg);
+  padding:18px;
+}
+.tele-topo{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+.tele-icone{
+  width:38px;height:38px;
+  flex:0 0 38px;
+  border-radius:11px;
+  background:rgba(53,208,127,.1);
+  display:grid;
+  place-items:center;
+  color:var(--verde);
+  font-size:18px;
+}
+.tele h3{font-size:15px;font-weight:500}
+.tele p{font-size:12px;color:var(--texto-3);margin-top:2px}
+.tele .btn{
+  width:100%;
+  margin-top:14px;
+}
+
+/* Lateral */
+.acoes{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.acao{
+  padding:18px;
+  border:1px solid var(--borda);
+  border-radius:var(--r-md);
+  background:rgba(255,255,255,.025);
+}
+.acao h3{font-size:15px;font-weight:500;margin-bottom:4px}
+.acao p{font-size:12px;color:var(--texto-3);margin-bottom:14px}
+.acao .btn{width:100%}
+
+.info{
+  margin-top:20px;
+}
+.info-linha{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:12px 0;
+  border-bottom:1px solid var(--borda);
+  font-family:var(--fonte-dados);
+  font-size:13px;
+}
+.info-linha:last-child{border-bottom:0;padding-bottom:0}
+.info-linha span:first-child{color:var(--texto-3)}
+.info-linha span:last-child{color:var(--texto-2);text-align:right}
+
+/* Responsividade */
+@media(max-width:850px){
+  .conteudo{grid-template-columns:1fr}
+  .topo{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:560px){
+  .logo{position:static;margin:20px 20px 0}
+  .topo,.conteudo{width:min(100% - 28px,1180px)}
+  .topo{padding-top:24px}
+  h1{font-size:28px}
+  .card{padding:16px}
+  .calendario{gap:4px}
+  .dia{min-height:45px;padding:5px;font-size:12px}
+  .consulta{align-items:flex-start;flex-direction:column}
+  .consulta .btn{width:100%}
+}
+</style>
+</head>
+
+<body>
+
+<a href="home.html" class="logo"><i></i>Digitaly</a>
+
+<header class="topo">
+  <div class="topo-esquerda">
+    <span class="tag"><i></i>Área do cliente</span>
+    <h1>Olá, João!</h1>
+    <p class="subtitulo">Acompanhe suas consultas e seus próximos atendimentos.</p>
+  </div>
+</header>
+
+<main class="conteudo">
+
+  <section>
+    <div class="card">
+      <div class="card-titulo">
+        <div>
+          <h2>Minhas consultas</h2>
+          <p>Confira seus atendimentos já agendados.</p>
+        </div>
+      </div>
+
+      <div class="calendario-nav">
+        <button class="seta" id="mesAnterior" aria-label="Mês anterior">‹</button>
+        <span class="mes" id="mesAtual"></span>
+        <button class="seta" id="mesProximo" aria-label="Próximo mês">›</button>
+      </div>
+
+      <div class="calendario" id="calendario"></div>
+
+      <div class="legenda">
+        <span><i class="bolinha"></i> Consulta agendada</span>
+        <span><i class="bolinha hj"></i> Hoje</span>
+      </div>
+    </div>
+
+    <div class="card consultas">
+      <div class="card-titulo">
+        <div>
+          <h2>Próximos atendimentos</h2>
+          <p>Suas consultas futuras.</p>
+        </div>
+      </div>
+
+      <div class="consulta">
+        <div class="consulta-info">
+          <div class="consulta-data">12 DE SETEMBRO · 14:00</div>
+          <h3>Dr. Carlos Mendes</h3>
+          <p>Consulta de acompanhamento · Teleatendimento</p>
+          <span class="status"><i></i> Agendada</span>
+        </div>
+        <button class="btn btn-secundario" onclick="entrarTeleatendimento('Carlos Mendes')">
+          Entrar na consulta
+        </button>
+      </div>
+
+      <div class="consulta">
+        <div class="consulta-info">
+          <div class="consulta-data">18 DE SETEMBRO · 10:30</div>
+          <h3>Dra. Mariana Silva</h3>
+          <p>Consulta de retorno · Presencial</p>
+          <span class="status"><i></i> Agendada</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside>
+    <div class="card">
+      <div class="card-titulo">
+        <div>
+          <h2>Agendamento</h2>
+          <p>Precisa de uma nova consulta?</p>
+        </div>
+      </div>
+
+      <div class="acoes">
+        <div class="acao">
+          <h3>Marcar nova consulta</h3>
+          <p>Escolha o tipo de atendimento, profissional e horário.</p>
+          <button class="btn btn-primario" onclick="window.location.href='agendar-consulta.html'">
+            Nova consulta
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card info">
+      <div class="card-titulo">
+        <div>
+          <h2>Minha conta</h2>
+          <p>Informações do cliente.</p>
+        </div>
+      </div>
+
+      <div class="info-linha">
+        <span>Nome</span>
+        <span>João</span>
+      </div>
+      <div class="info-linha">
+        <span>E-mail</span>
+        <span>joao@exemplo.com</span>
+      </div>
+      <div class="info-linha">
+        <span>Consultas futuras</span>
+        <span>2</span>
+      </div>
+    </div>
+  </aside>
+
+</main>
+
+<script>
+// ============================================================
+// AUTENTICAÇÃO — DEMONSTRAÇÃO
+// ============================================================
+// Quando o login estiver integrado ao NestJS/Supabase, esta
+// verificação deve usar a sessão real do usuário.
+// Por enquanto, usamos localStorage para simular o login.
+//
+// No login real, após autenticar:
+// localStorage.setItem('usuarioLogado', 'true');
+
+//if(localStorage.getItem('usuarioLogado') !== 'true'){
+//  window.location.replace('login.html');
+//}
+
+// ============================================================
+// CALENDÁRIO
+// ============================================================
+
+const consultasAgendadas = {
+  // Exemplos de consultas já marcadas.
+  // Depois esses dados virão do NestJS/Prisma.
+  '2026-09-12': true,
+  '2026-09-18': true
+};
+
+let dataCalendario = new Date();
+
+const nomesMeses = [
+  'janeiro','fevereiro','março','abril','maio','junho',
+  'julho','agosto','setembro','outubro','novembro','dezembro'
+];
+
+const nomesDias = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+
+function chaveData(ano, mes, dia){
+  return `${ano}-${String(mes + 1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+}
+
+function renderizarCalendario(){
+  const calendario = document.getElementById('calendario');
+  const mesAtual = document.getElementById('mesAtual');
+
+  const ano = dataCalendario.getFullYear();
+  const mes = dataCalendario.getMonth();
+
+  mesAtual.textContent = `${nomesMeses[mes]} de ${ano}`;
+
+  calendario.innerHTML = '';
+
+  nomesDias.forEach(nome => {
+    const div = document.createElement('div');
+    div.className = 'dia-semana';
+    div.textContent = nome;
+    calendario.appendChild(div);
+  });
+
+  const primeiroDia = new Date(ano, mes, 1).getDay();
+  const quantidadeDias = new Date(ano, mes + 1, 0).getDate();
+
+  for(let i = 0; i < primeiroDia; i++){
+    const vazio = document.createElement('div');
+    vazio.className = 'dia vazio';
+    calendario.appendChild(vazio);
+  }
+
+  const hoje = new Date();
+
+  for(let dia = 1; dia <= quantidadeDias; dia++){
+    const elemento = document.createElement('div');
+    const chave = chaveData(ano, mes, dia);
+
+    elemento.className = 'dia';
+
+    if(
+      dia === hoje.getDate() &&
+      mes === hoje.getMonth() &&
+      ano === hoje.getFullYear()
+    ){
+      elemento.classList.add('hoje');
+    }
+
+    if(consultasAgendadas[chave]){
+      elemento.classList.add('consulta');
+      elemento.innerHTML = `${dia}<span class="ponto"></span>`;
+    }else{
+      elemento.textContent = dia;
+    }
+
+    calendario.appendChild(elemento);
+  }
+}
+
+document.getElementById('mesAnterior').addEventListener('click', () => {
+  dataCalendario.setMonth(dataCalendario.getMonth() - 1);
+  renderizarCalendario();
+});
+
+document.getElementById('mesProximo').addEventListener('click', () => {
+  dataCalendario.setMonth(dataCalendario.getMonth() + 1);
+  renderizarCalendario();
+});
+
+renderizarCalendario();
+
+// ============================================================
+// TELEATENDIMENTO
+// ============================================================
+
+function entrarTeleatendimento(medico){
+  // Por enquanto é apenas uma simulação.
+  // No sistema real, o NestJS verificará se:
+  // 1. o usuário está autenticado;
+  // 2. a consulta pertence a esse cliente;
+  // 3. a consulta é de teleatendimento;
+  // 4. o horário permite entrar na sala.
+  alert(`Abrindo o teleatendimento com ${medico}...`);
+
+  // Futuramente:
+  // window.location.href = 'teleatendimento.html?id=CONSULTA_ID';
+}
+</script>
+
+</body>
+</html>
