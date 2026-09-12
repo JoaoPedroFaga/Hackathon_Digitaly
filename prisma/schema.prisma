@@ -28,6 +28,7 @@ model cliente {
   rua                                  String
   numero                               String
   nascimento                           String      @db.VarChar(10)
+  complemento                          String?
   consultas_consultas_clienteTocliente consultas[] @relation("consultas_clienteTocliente")
 }
 

@@ -52,4 +52,7 @@ export class CreateClienteDto {
     @IsDate()
     @IsNotEmpty()
     nascimento : string;
+
+    @Length(1,10)
+    complemento : string;
 }
