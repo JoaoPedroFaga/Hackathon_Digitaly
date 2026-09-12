@@ -1,58 +1,68 @@
-datasource db {
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// Tabela de Usuários (Serve para Pacientes, Médicos e Admins)
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  password  String   // Senha criptografada (hash)
-  role      Role     @default(PATIENT) // Papel do usuário
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relacionamentos para consultas
-  patientAppointments Appointment[] @relation("PatientAppointments")
-  doctorAppointments  Appointment[] @relation("DoctorAppointments")
-
-  @@map("users")
+datasource db {
+  provider = "postgresql"
 }
 
-// Tipos de usuários permitidos no sistema
-enum Role {
-  PATIENT
-  DOCTOR
-  ADMIN
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model adm {
+  cpf                    String   @id @db.VarChar(11)
+  email                  String
+  senha                  String
+  medico_medico_admToadm medico[] @relation("medico_admToadm")
 }
 
-// Tabela de Consultas / Agendamentos
-model Appointment {
-  id           String            @id @default(uuid())
-  date         DateTime          // Data e hora da consulta
-  status       AppointmentStatus @default(PENDING)
-  
-  // Chaves estrangeiras para ligar o Paciente e o Médico
-  patientId    String
-  patient      User              @relation("PatientAppointments", fields: [patientId], references: [id])
-  
-  doctorId     String
-  doctor       User              @relation("DoctorAppointments", fields: [doctorId], references: [id])
-
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-
-  @@map("appointments")
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model cliente {
+  cpf                                  String      @id @db.VarChar(11)
+  nome                                 String
+  sobrenome                            String
+  tel                                  String      @db.VarChar(11)
+  sexo                                 Int
+  email                                String
+  senha                                String
+  estado                               String
+  cidade                               String
+  rua                                  String
+  numero                               String
+  nascimento                           String      @db.VarChar(10)
+  consultas_consultas_clienteTocliente consultas[] @relation("consultas_clienteTocliente")
 }
 
-// Status possíveis de uma consulta
-enum AppointmentStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  COMPLETED
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model medico {
+  crm                                String      @db.VarChar(7)
+  crm_estado                         String      @db.VarChar(2)
+  cpf                                String      @unique @db.VarChar(11)
+  nome                               String
+  sobrenome                          String
+  email                              String
+  senha                              String
+  adm                                String      @db.VarChar(11)
+  consultas_consultas_medicoTomedico consultas[] @relation("consultas_medicoTomedico")
+  adm_medico_admToadm                adm         @relation("medico_admToadm", fields: [adm], references: [cpf], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([crm, crm_estado])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model consultas {
+  id                                 Int     @id @default(autoincrement())
+  cliente                            String  @db.VarChar(11)
+  medico                             String  @db.VarChar(11)
+  data                               String  @db.VarChar(10)
+  hora                               String  @db.VarChar(5)
+  motivo                             String
+  sintomas                           String?
+  medicacao                          String?
+  piora                              String?
+  obs                                String?
+  relatorio                          String?
+  cliente_consultas_clienteTocliente cliente @relation("consultas_clienteTocliente", fields: [cliente], references: [cpf], onDelete: NoAction, onUpdate: NoAction)
+  medico_consultas_medicoTomedico    medico  @relation("consultas_medicoTomedico", fields: [medico], references: [cpf], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([cliente, data, hora], map: "cli")
+  @@unique([medico, data, hora], map: "med")
 }
