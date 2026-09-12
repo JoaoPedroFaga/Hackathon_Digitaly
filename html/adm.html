@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administração · Digitaly</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --grafite-950:#0B0D10; --grafite-900:#121417; --grafite-800:#1B1E23;
+  --grafite-700:#262A31; --grafite-600:#3A3F48; --grafite-500:#5B6270;
+  --grafite-400:#7D8494; --grafite-300:#A5ACB8; --grafite-200:#CFD4DC;
+  --grafite-50:#F5F7FA;
+  --celeste-500:#009FFF; --celeste-400:#33B3FF;
+  --grad-marca:linear-gradient(135deg,#009FFF 0%,#4CC9FF 100%);
+  --fonte-display:'Inter',system-ui,sans-serif;
+  --fonte-texto:'Inter',system-ui,sans-serif;
+  --fonte-dados:'IBM Plex Sans',system-ui,sans-serif;
+  --r-md:12px; --r-lg:16px; --r-pill:999px;
+  --borda:rgba(255,255,255,.08);
+  --borda-forte:rgba(255,255,255,.16);
+  --bg:var(--grafite-950); --bg-elev:var(--grafite-900);
+  --texto:var(--grafite-50); --texto-2:var(--grafite-300); --texto-3:var(--grafite-500);
+  --marca-texto:var(--celeste-400);
+  --verde:#35D07F;
+  --vermelho:#FF647C;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:var(--fonte-texto);
+  font-size:15px;
+  line-height:1.6;
+  color:var(--texto);
+  background:var(--bg);
+  min-height:100vh;
+}
+
+.logo{
+  position:fixed;
+  top:24px;
+  left:24px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--fonte-display);
+  font-weight:500;
+  font-size:17px;
+  color:var(--texto);
+  text-decoration:none;
+  z-index:10;
+}
+
+.logo:hover{text-decoration:none}
+
+.logo i{
+  width:22px;height:22px;border-radius:6px;
+  background:var(--grad-marca);display:inline-block;
+}
+
+.topo{
+  width:min(1180px, calc(100% - 48px));
+  margin:0 auto;
+  padding:34px 0 24px;
+}
+
+.tag{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--fonte-dados);
+  font-size:12px;
+  color:var(--texto-2);
+  padding:6px 12px;
+  border:1px solid var(--borda);
+  border-radius:var(--r-pill);
+  margin-bottom:14px;
+}
+
+.tag i{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--celeste-500);
+  box-shadow:0 0 10px var(--celeste-500);
+}
+
+h1{
+  font-family:var(--fonte-display);
+  font-weight:100;
+  font-size:32px;
+  line-height:1.2;
+}
+
+.subtitulo{color:var(--texto-2);margin-top:7px}
+
+.conteudo{
+  width:min(1180px, calc(100% - 48px));
+  margin:0 auto;
+  padding-bottom:40px;
+  display:grid;
+  grid-template-columns:minmax(0, 1.25fr) minmax(320px, .75fr);
+  gap:20px;
+}
+
+.card{
+  background:var(--bg-elev);
+  border:1px solid var(--borda);
+  border-radius:var(--r-lg);
+  padding:22px;
+}
+
+.card-titulo{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.card-titulo h2{font-size:18px;font-weight:500}
+.card-titulo p{color:var(--texto-3);font-size:13px;margin-top:2px}
+
+.formulario{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:17px;
+}
+
+.campo{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.campo.completo{grid-column:1 / -1}
+
+.campo label{
+  font-family:var(--fonte-dados);
+  font-size:12px;
+  color:var(--texto-2);
+}
+
+.campo input{
+  width:100%;
+  height:46px;
+  padding:0 14px;
+  border-radius:var(--r-md);
+  border:1px solid var(--borda-forte);
+  background:var(--grafite-800);
+  color:var(--texto);
+  font-family:var(--fonte-texto);
+  font-size:14px;
+  outline:none;
+  transition:.2s ease;
+}
+
+.campo input::placeholder{color:var(--texto-3)}
+
+.campo input:focus{
+  border-color:var(--celeste-500);
+  box-shadow:0 0 0 3px rgba(0,159,255,.10);
+}
+
+.acoes{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:24px;
+}
+
+.btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+  padding:0 20px;
+  border-radius:var(--r-pill);
+  font-family:var(--fonte-texto);
+  font-weight:500;
+  font-size:14px;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.btn-secundario{
+  background:var(--grafite-800);
+  color:var(--texto);
+  border:1px solid var(--borda-forte);
+}
+
+.btn-secundario:hover{border-color:var(--celeste-500)}
+
+.btn-principal{
+  border:0;
+  background:var(--grad-marca);
+  color:white;
+}
+
+.btn-principal:hover{filter:brightness(1.08);transform:translateY(-1px)}
+
+.info-linha{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:13px 0;
+  border-bottom:1px solid var(--borda);
+  font-family:var(--fonte-dados);
+  font-size:13px;
+}
+
+.info-linha:last-child{border-bottom:0}
+.info-linha span:first-child{color:var(--texto-3)}
+.info-linha span:last-child{color:var(--texto-2);text-align:right}
+
+.lista-medicos{margin-top:20px}
+
+.medico{
+  border:1px solid var(--borda);
+  border-radius:var(--r-md);
+  background:rgba(255,255,255,.025);
+  padding:14px;
+  margin-bottom:10px;
+}
+
+.medico:last-child{margin-bottom:0}
+
+.medico-topo{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.medico h3{font-size:14px;font-weight:500}
+.medico p{
+  color:var(--texto-3);
+  font-family:var(--fonte-dados);
+  font-size:12px;
+  margin-top:2px;
+}
+
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  color:var(--verde);
+}
+
+.status i{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--verde);
+}
+
+.medico-dados{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px 15px;
+  margin-top:12px;
+  padding-top:11px;
+  border-top:1px solid var(--borda);
+}
+
+.medico-dados span{
+  color:var(--texto-3);
+  font-family:var(--fonte-dados);
+  font-size:11px;
+}
+
+.aviso{
+  margin-top:18px;
+  padding:12px 14px;
+  border:1px solid rgba(0,159,255,.22);
+  border-radius:var(--r-md);
+  background:rgba(0,159,255,.07);
+  color:var(--texto-2);
+  font-size:12px;
+}
+
+.mensagem{
+  display:none;
+  margin-top:18px;
+  padding:11px 14px;
+  border-radius:var(--r-md);
+  font-size:13px;
+}
+
+.mensagem.sucesso{
+  display:block;
+  color:var(--verde);
+  border:1px solid rgba(53,208,127,.25);
+  background:rgba(53,208,127,.07);
+}
+
+@media(max-width:850px){
+  .conteudo{grid-template-columns:1fr}
+}
+
+@media(max-width:560px){
+  .logo{position:static;margin:20px 20px 0}
+  .topo,.conteudo{width:min(100% - 28px,1180px)}
+  .topo{padding-top:24px}
+  h1{font-size:28px}
+  .card{padding:16px}
+  .formulario{grid-template-columns:1fr}
+  .campo.completo{grid-column:auto}
+  .acoes{flex-direction:column}
+  .btn{width:100%}
+}
+</style>
+</head>
+
+<body>
+
+<a href="home.html" class="logo"><i></i>Digitaly</a>
+
+<header class="topo">
+  <div>
+    <span class="tag"><i></i>Área do administrador</span>
+    <h1>Administração</h1>
+    <p class="subtitulo">Gerencie os médicos cadastrados na plataforma.</p>
+  </div>
+</header>
+
+<main class="conteudo">
+
+  <section>
+    <div class="card">
+      <div class="card-titulo">
+        <div>
+          <h2>Adicionar novo médico</h2>
+          <p>Cadastre os dados profissionais e de contato do médico.</p>
+        </div>
+      </div>
+
+      <form id="formMedico">
+        <div class="formulario">
+
+          <div class="campo">
+            <label for="crm">CRM</label>
+            <input
+              type="text"
+              id="crm"
+              name="crm"
+              placeholder="Ex.: 123456"
+              required
+            >
+          </div>
+
+          <div class="campo">
+            <label for="cpf">CPF</label>
+            <input
+              type="text"
+              id="cpf"
+              name="cpf"
+              placeholder="000.000.000-00"
+              maxlength="14"
+              required
+            >
+          </div>
+
+          <div class="campo">
+            <label for="nome">Nome</label>
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder="Nome do médico"
+              required
+            >
+          </div>
+
+          <div class="campo">
+            <label for="sobrenome">Sobrenome</label>
+            <input
+              type="text"
+              id="sobrenome"
+              name="sobrenome"
+              placeholder="Sobrenome do médico"
+              required
+            >
+          </div>
+
+          <div class="campo completo">
+            <label for="telefone">Telefone</label>
+            <input
+              type="tel"
+              id="telefone"
+              name="telefone"
+              placeholder="(00) 00000-0000"
+              maxlength="15"
+              required
+            >
+          </div>
+
+          <div class="campo completo">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="email@email.com"
+              required
+            >
+          </div>
+
+          <div class="campo completo">
+            <label for="senha">Senha</label>
+            <input
+              type="senha"
+              id="senha"
+              name="senha"
+              placeholder="Sua senha"
+              required
+            >
+          </div>
+
+        </div>
+
+        <div class="acoes">
+          <button type="reset" class="btn btn-secundario">Limpar</button>
+          <button type="submit" class="btn btn-principal">Adicionar médico</button>
+        </div>
+
+        <div class="mensagem" id="mensagem"></div>
+      </form>
+    </div>
+
+    <div class="card lista-medicos">
+      <div class="card-titulo">
+        <div>
+          <h2>Médicos cadastrados</h2>
+          <p>Profissionais atualmente registrados no sistema.</p>
+        </div>
+      </div>
+
+      <div id="listaMedicos">
+        <div class="medico">
+          <div class="medico-topo">
+            <div>
+              <h3>Dr. Carlos Almeida</h3>
+              <p>CRM 123456</p>
+            </div>
+            <span class="status"><i></i> Ativo</span>
+          </div>
+
+          <div class="medico-dados">
+            <span>CPF: 123.456.789-00</span>
+            <span>Telefone: (16) 99999-9999</span>
+          </div>
+        </div>
+
+        <div class="medico">
+          <div class="medico-topo">
+            <div>
+              <h3>Dra. Ana Martins</h3>
+              <p>CRM 654321</p>
+            </div>
+            <span class="status"><i></i> Ativo</span>
+          </div>
+
+          <div class="medico-dados">
+            <span>CPF: 987.654.321-00</span>
+            <span>Telefone: (16) 98888-8888</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside>
+    <div class="card">
+      <div class="card-titulo">
+        <div>
+          <h2>Resumo</h2>
+          <p>Visão geral dos profissionais.</p>
+        </div>
+      </div>
+
+      <div class="info-linha">
+        <span>Médicos cadastrados</span>
+        <span id="totalMedicos">2</span>
+      </div>
+
+      <div class="info-linha">
+        <span>Médicos ativos</span>
+        <span id="medicosAtivos">2</span>
+      </div>
+    </div>
+
+    <div class="card aviso">
+      <strong>Cadastro</strong><br>
+      Nesta versão do protótipo, os dados são adicionados apenas à interface.
+      Posteriormente, o formulário poderá enviar as informações para o NestJS
+      e persistir os médicos no banco de dados.
+    </div>
+  </aside>
+
+</main>
+
+<script>
+const form = document.getElementById('formMedico');
+const lista = document.getElementById('listaMedicos');
+const mensagem = document.getElementById('mensagem');
+const totalMedicos = document.getElementById('totalMedicos');
+const medicosAtivos = document.getElementById('medicosAtivos');
+
+let quantidadeMedicos = 2;
+
+function formatarCPF(valor){
+  valor = valor.replace(/\D/g,'').slice(0,11);
+  valor = valor.replace(/(\d{3})(\d)/,'$1.$2');
+  valor = valor.replace(/(\d{3})(\d)/,'$1.$2');
+  valor = valor.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  return valor;
+}
+
+function formatarTelefone(valor){
+  valor = valor.replace(/\D/g,'').slice(0,11);
+
+  if(valor.length <= 10){
+    valor = valor.replace(/(\d{2})(\d)/,'($1) $2');
+    valor = valor.replace(/(\d{4})(\d)/,'$1-$2');
+  }else{
+    valor = valor.replace(/(\d{2})(\d)/,'($1) $2');
+    valor = valor.replace(/(\d{5})(\d)/,'$1-$2');
+  }
+
+  return valor;
+}
+
+document.getElementById('cpf').addEventListener('input', function(){
+  this.value = formatarCPF(this.value);
+});
+
+document.getElementById('telefone').addEventListener('input', function(){
+  this.value = formatarTelefone(this.value);
+});
+
+form.addEventListener('submit', function(event){
+  event.preventDefault();
+
+  const crm = document.getElementById('crm').value.trim();
+  const cpf = document.getElementById('cpf').value.trim();
+  const nome = document.getElementById('nome').value.trim();
+  const sobrenome = document.getElementById('sobrenome').value.trim();
+  const telefone = document.getElementById('telefone').value.trim();
+
+  if(!crm || !cpf || !nome || !sobrenome || !telefone){
+    mensagem.className = 'mensagem sucesso';
+    mensagem.style.color = 'var(--vermelho)';
+    mensagem.style.borderColor = 'rgba(255,100,124,.25)';
+    mensagem.style.background = 'rgba(255,100,124,.07)';
+    mensagem.textContent = 'Preencha todos os campos para cadastrar o médico.';
+    return;
+  }
+
+  const novoMedico = document.createElement('div');
+  novoMedico.className = 'medico';
+
+  novoMedico.innerHTML = `
+    <div class="medico-topo">
+      <div>
+        <h3>${nome} ${sobrenome}</h3>
+        <p>CRM ${crm}</p>
+      </div>
+      <span class="status"><i></i> Ativo</span>
+    </div>
+
+    <div class="medico-dados">
+      <span>CPF: ${cpf}</span>
+      <span>Telefone: ${telefone}</span>
+    </div>
+  `;
+
+  lista.appendChild(novoMedico);
+
+  quantidadeMedicos++;
+  totalMedicos.textContent = quantidadeMedicos;
+  medicosAtivos.textContent = quantidadeMedicos;
+
+  mensagem.className = 'mensagem sucesso';
+  mensagem.style.color = 'var(--verde)';
+  mensagem.style.borderColor = 'rgba(53,208,127,.25)';
+  mensagem.style.background = 'rgba(53,208,127,.07)';
+  mensagem.textContent = `Médico ${nome} ${sobrenome} adicionado com sucesso.`;
+
+  form.reset();
+});
+
+document.getElementById('formCadastro').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const campos = {
+    email: document.getElementById('email'),
+    senha: document.getElementById('senha'),
+  };
+
+  let valido = true;
+
+  function validar(campo, ajuda, mensagem, condicao){
+    if(!condicao){
+      campo.classList.add('erro');
+      ajuda.textContent = mensagem;
+      ajuda.classList.add('erro');
+      valido = false;
+    } else {
+      campo.classList.remove('erro');
+      ajuda.textContent = '';
+      ajuda.classList.remove('erro');
+    }
+  }
+
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campos.email.value.trim());
+  validar(
+    campos.email,
+    document.getElementById('ajudaEmail'),
+    'Digite um e-mail válido.',
+    emailValido
+  );
+
+  validar(
+    campos.senha,
+    document.getElementById('ajudaSenha'),
+    'A senha deve ter pelo menos 8 caracteres.',
+    campos.senha.value.length >= 8
+  );
+
+  if(valido){
+    // Por enquanto, apenas redireciona.
+    // Aqui será feita a integração com o backend/NestJS.
+    window.location.href = 'medico.html';
+  }
+
+});
+
+</script>
+
+</body>
+</html>
