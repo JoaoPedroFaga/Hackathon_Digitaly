@@ -1,4 +1,4 @@
-import { IsDate, IsString, IsNotEmpty, IsEmail, IsPositive, Length, IsInt } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, Length } from 'class-validator';
 
 export class CreateClienteDto {
     @IsString()
@@ -19,10 +19,9 @@ export class CreateClienteDto {
     @Length(1,11)
     tel : string;
 
-    @IsInt()
-    @IsPositive()
+    @IsString()
     @IsNotEmpty()
-    sexo: number;
+    sexo: string;
 
     @IsEmail()
     @IsNotEmpty()
@@ -49,10 +48,10 @@ export class CreateClienteDto {
     numero: string;
 
     @Length(1,10)
-    @IsDate()
+    @IsString()
     @IsNotEmpty()
     nascimento : string;
 
-    @Length(1,10)
+    @IsString()
     complemento : string;
 }

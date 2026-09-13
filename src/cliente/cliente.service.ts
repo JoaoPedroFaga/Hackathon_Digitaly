@@ -1,5 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js'; // injeção do serviço prisma para comunicação com o BD
+import { BadRequestException, Injectable, ConflictException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateClienteDto } from './dto/create-cliente.dto.js';
 import { UpdateClienteDto } from './dto/update-cliente.dto.js';
 import { cpf } from 'cpf-cnpj-validator';
@@ -7,13 +7,20 @@ import { cpf } from 'cpf-cnpj-validator';
 @Injectable()
 export class ClienteService {
 
-  // adiciona o prisma a esse serviço
   constructor(private prisma: PrismaService) {}
 
   async create(createClienteDto: CreateClienteDto) {
 
     if (!cpf.isValid(createClienteDto.cpf)){
       throw new BadRequestException("CPF inválido.")
+    }
+
+    const clienteExistente = await this.prisma.cliente.findUnique({
+      where: { cpf: createClienteDto.cpf },
+    });
+
+    if (clienteExistente) {
+      throw new ConflictException('Usuário já está cadastrado.');
     }
 
     return await this.prisma.cliente.create({

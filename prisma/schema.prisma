@@ -16,20 +16,21 @@ model adm {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model cliente {
-  cpf                                  String      @id @db.VarChar(11)
-  nome                                 String
-  sobrenome                            String
-  tel                                  String      @db.VarChar(11)
-  sexo                                 Int
-  email                                String
-  senha                                String
-  estado                               String
-  cidade                               String
-  rua                                  String
-  numero                               String
-  nascimento                           String      @db.VarChar(10)
-  complemento                          String?
-  consultas_consultas_clienteTocliente consultas[] @relation("consultas_clienteTocliente")
+  cpf                                      String        @id @db.VarChar(11)
+  nome                                     String
+  sobrenome                                String
+  tel                                      String        @db.VarChar(11)
+  sexo                                     String
+  email                                    String
+  senha                                    String
+  estado                                   String
+  cidade                                   String
+  rua                                      String
+  numero                                   String
+  nascimento                               String        @db.VarChar(10)
+  complemento                              String?
+  consultas_consultas_clienteTocliente     consultas[]   @relation("consultas_clienteTocliente")
+  verificacao_verificacao_clienteTocliente verificacao[] @relation("verificacao_clienteTocliente")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -66,4 +67,15 @@ model consultas {
 
   @@unique([cliente, data, hora], map: "cli")
   @@unique([medico, data, hora], map: "med")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model verificacao {
+  id                                   Int       @id @default(autoincrement())
+  cliente                              String    @db.VarChar(11)
+  data                                 DateTime? @default(now()) @db.Timestamp(6)
+  codigo                               Int
+  cliente_verificacao_clienteTocliente cliente   @relation("verificacao_clienteTocliente", fields: [cliente], references: [cpf], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([cliente, data], map: "cli_data")
 }

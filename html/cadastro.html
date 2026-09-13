@@ -255,6 +255,7 @@ form{
         maxlength="14"
         required
       >
+      <span class="ajuda" id="ajudaCPF"></span>
     </div>
 
     <div class="campo">
@@ -267,6 +268,7 @@ form{
         maxlength="10"
         required
       >
+      <span class="ajuda" id="ajudaNascimento"></span>
     </div>
 
     <div class="linha">
@@ -306,13 +308,13 @@ form{
       <div class="campo">
         <label for="cidade">Cidade</label>
         <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
-        <span class="ajuda" id="ajudaSobrenome"></span>
+        <span class="ajuda" id="ajudaCidade"></span>
       </div>
 
       <div class="campo">
         <label for="estado">Estado</label>
         <input type="text" id="estado" name="estado" placeholder="Sigla do estado" maxlength="2" required>
-        <span class="ajuda" id="ajudaNome"></span>
+        <span class="ajuda" id="ajudaEstado"></span>
       </div>
     </div>
 
@@ -320,20 +322,20 @@ form{
       <div class="campo">
         <label for="rua">Rua</label>
         <input type="text" id="rua" name="rua" placeholder="Rua" required>
-        <span class="ajuda" id="ajudaNome"></span>
+        <span class="ajuda" id="ajudaRua"></span>
       </div>
 
       <div class="campo">
-        <label for="numero">Numero</label>
-        <input type="text" id="numero" name="numero" placeholder="Numero" required>
-        <span class="ajuda" id="ajudaSobrenome"></span>
+        <label for="numero">Número</label>
+        <input type="text" id="numero" name="numero" placeholder="Número" required>
+        <span class="ajuda" id="ajudaNumero"></span>
       </div>
     </div>
 
     <div class="campo">
         <label for="complemento">Complemento</label>
         <input type="text" id="complemento" name="complemento" placeholder="Casa, apto, ponto de referência, etc.">
-        <span class="ajuda" id="ajudaNome"></span>
+        <span class="ajuda" id="ajudaComplemento"></span>
       </div>
 
     <button type="submit" class="btn btn-primario">Criar conta</button>
@@ -349,11 +351,17 @@ document.getElementById('formCadastro').addEventListener('submit', function(e){
   const campos = {
     nome: document.getElementById('nome'),
     sobrenome: document.getElementById('sobrenome'),
+    cpf: document.getElementById('cpf'),
+    nascimento: document.getElementById('nascimento'),
     telefone: document.getElementById('telefone'),
     sexo: document.getElementById('sexo'),
     email: document.getElementById('email'),
     senha: document.getElementById('senha'),
-    endereco: document.getElementById('cidade')
+    cidade: document.getElementById('cidade'),
+    estado: document.getElementById('estado'),
+    rua: document.getElementById('rua'),
+    numero: document.getElementById('numero'),
+    complemento: document.getElementById('complemento'),
   };
 
   let valido = true;
@@ -383,6 +391,22 @@ document.getElementById('formCadastro').addEventListener('submit', function(e){
     document.getElementById('ajudaSobrenome'),
     'Digite seu sobrenome.',
     campos.sobrenome.value.trim().length >= 2
+  );
+
+  const cpfNumeros = campos.cpf.value.replace(/\D/g, '').replace('.','').replace('-','');
+  validar(
+    campos.cpf,
+    document.getElementById('ajudaCPF'),
+    'Digite um CPF válido.',
+    cpfNumeros.length == 11
+  );
+
+  const nascimentoNumeros = campos.nascimento.value.replace(/\D/g, '').replace('/','')
+  validar(
+    campos.nascimento,
+    document.getElementById('ajudaNascimento'),
+    'Digite uma data válida.',
+    nascimentoNumeros.length == 8
   );
 
   const telefoneNumeros = campos.telefone.value.replace(/\D/g, '');
@@ -416,16 +440,79 @@ document.getElementById('formCadastro').addEventListener('submit', function(e){
   );
 
   validar(
-    campos.endereco,
-    document.getElementById('ajudaEndereco'),
-    'Digite seu endereço.',
-    campos.endereco.value.trim().length >= 5
+    campos.cidade,
+    document.getElementById('ajudaCidade'),
+    'Digite o nome da sua cidade.',
+    campos.cidade.value.length > 0
+  );
+
+  validar(
+    campos.estado,
+    document.getElementById('ajudaEstado'),
+    'Digite a sigla do seu estado.',
+    campos.estado.value.length > 0
+  );
+
+  validar(
+    campos.rua,
+    document.getElementById('ajudaRua'),
+    'Digite o nome da sua rua.',
+    campos.rua.value.length > 0
+  );
+
+  validar(
+    campos.numero,
+    document.getElementById('ajudaNumero'),
+    'Digite o número da sua casa.',
+    campos.numero.value.length > 0
   );
 
   if(valido){
-    // Por enquanto, apenas redireciona.
-    // Aqui será feita a integração com o backend/NestJS.
-    window.location.href = 'login.html';
+    
+    let valorSexo = 0;
+    const sexoSelecionado = campos.sexo.value;
+    if (sexoSelecionado === 'feminino') valorSexo = 'Feminino';
+    else if (sexoSelecionado === 'masculino') valorSexo = 'Masculino';
+    else if (sexoSelecionado === 'outro') valorSexo = 'Outro';
+    else if (sexoSelecionado === 'nao-informar') valorSexo = 'Nao_Informado';
+
+    const dadosCliente = {
+      nome: campos.nome.value.trim(),
+      sobrenome: campos.sobrenome.value.trim(),
+      cpf: cpfNumeros,
+      nascimento: campos.nascimento.value.trim(),
+      tel: telefoneNumeros,
+      sexo: valorSexo,
+      email: campos.email.value.trim(),
+      senha: campos.senha.value,
+      estado: campos.estado.value.trim(),
+      cidade: campos.cidade.value.trim(),
+      rua: campos.rua.value.trim(),
+      numero: campos.numero.value.trim(),
+      complemento: campos.complemento.value.trim()
+    };
+
+    fetch('http://192.168.0.111:3000/cliente', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dadosCliente),
+    })
+    .then(async response => {
+      const resultado = await response.json();
+      if (!response.ok) {
+        throw new Error(resultado.message || 'Erro ao realizar cadastro.');
+      }
+      return resultado;
+    })
+    .then(data => {
+      alert('Cadastro realizado com sucesso!');
+      window.location.href = 'login.html';
+    })
+    .catch(error => {
+      alert('Erro: ' + error.message);
+    });
   }
 });
 
