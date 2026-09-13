@@ -105,44 +105,60 @@ form{display:flex;flex-direction:column;gap:var(--s-5)}
 </div>
 
 <script>
+const API_URL = 'https://192.168.0.111:3000';
+
 document.getElementById('formLogin').addEventListener('submit', function(e){
   e.preventDefault();
-  const email = document.getElementById('email');
-  const senha = document.getElementById('senha');
-  const ajudaEmail = document.getElementById('ajudaEmail');
-  const ajudaSenha = document.getElementById('ajudaSenha');
+
+  const campos = {
+    email: document.getElementById('email'),
+    senha: document.getElementById('senha')
+  };
+
   let valido = true;
 
-  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
-  if(!emailValido){
-    email.classList.add('erro');
-    ajudaEmail.textContent = 'Digite um e-mail válido.';
-    ajudaEmail.classList.add('erro');
-    valido = false;
-  } else {
-    email.classList.remove('erro');
-    ajudaEmail.textContent = '';
-    ajudaEmail.classList.remove('erro');
+  function validar(campo, ajuda, mensagem, condicao){
+    if(!condicao){
+      campo.classList.add('erro');
+      ajuda.textContent = mensagem;
+      ajuda.classList.add('erro');
+      valido = false;
+    } else {
+      campo.classList.remove('erro');
+      ajuda.textContent = '';
+      ajuda.classList.remove('erro');
+    }
   }
 
-  if(senha.value.length < 1){
-    senha.classList.add('erro');
-    ajudaSenha.textContent = 'Digite sua senha.';
-    ajudaSenha.classList.add('erro');
-    valido = false;
-  } else {
-    senha.classList.remove('erro');
-    ajudaSenha.textContent = '';
-    ajudaSenha.classList.remove('erro');
-  }
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campos.email.value.trim());
+  validar(
+    campos.email,
+    document.getElementById('ajudaEmail'),
+    'Digite um e-mail válido.',
+    emailValido
+  );
+
+  validar(
+    campos.senha,
+    document.getElementById('ajudaSenha'),
+    'Digite sua senha.',
+    campos.senha.value.length > 0
+  );
 
   if(valido){
-    window.location.href = 'home.html';
+    let tipo_cliente = ""
+    
+    
+
+
+
+
+    window.location.href = 'cliente.html';
   }
 });
 
-[document.getElementById('email'), document.getElementById('senha')].forEach(campo=>{
-  campo.addEventListener('input', ()=>{
+[document.getElementById('email'), document.getElementById('senha')].forEach(campo => {
+  campo.addEventListener('input', () => {
     campo.classList.remove('erro');
     const ajuda = campo.id === 'email' ? document.getElementById('ajudaEmail') : document.getElementById('ajudaSenha');
     ajuda.textContent = '';

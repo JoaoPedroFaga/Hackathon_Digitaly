@@ -313,7 +313,18 @@ form{
 
       <div class="campo">
         <label for="estado">Estado</label>
-        <input type="text" id="estado" name="estado" placeholder="Sigla do estado" maxlength="2" required>
+        <select id="estado" name="estado" required>
+          <option value="">Selecione o estado</option>
+          <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
+          <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
+          <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+          <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+          <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
+          <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
+          <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
+          <option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+          <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+        </select>
         <span class="ajuda" id="ajudaEstado"></span>
       </div>
     </div>
@@ -383,14 +394,14 @@ document.getElementById('formCadastro').addEventListener('submit', function(e){
     campos.nome,
     document.getElementById('ajudaNome'),
     'Digite seu nome.',
-    campos.nome.value.trim().length >= 2
+    campos.nome.value.trim().length > 0
   );
 
   validar(
     campos.sobrenome,
     document.getElementById('ajudaSobrenome'),
     'Digite seu sobrenome.',
-    campos.sobrenome.value.trim().length >= 2
+    campos.sobrenome.value.trim().length > 0
   );
 
   const cpfNumeros = campos.cpf.value.replace(/\D/g, '').replace('.','').replace('-','');
@@ -401,13 +412,6 @@ document.getElementById('formCadastro').addEventListener('submit', function(e){
     cpfNumeros.length == 11
   );
 
-  const nascimentoNumeros = campos.nascimento.value.replace(/\D/g, '').replace('/','')
-  validar(
-    campos.nascimento,
-    document.getElementById('ajudaNascimento'),
-    'Digite uma data válida.',
-    nascimentoNumeros.length == 8
-  );
 
   const telefoneNumeros = campos.telefone.value.replace(/\D/g, '');
   validar(
@@ -449,8 +453,8 @@ document.getElementById('formCadastro').addEventListener('submit', function(e){
   validar(
     campos.estado,
     document.getElementById('ajudaEstado'),
-    'Digite a sigla do seu estado.',
-    campos.estado.value.length > 0
+    'Selecione um estado.',
+    campos.estado.value !== ''
   );
 
   validar(
@@ -492,7 +496,7 @@ document.getElementById('formCadastro').addEventListener('submit', function(e){
       complemento: campos.complemento.value.trim()
     };
 
-    fetch('http://192.168.0.111:3000/cliente', {
+    fetch('https://192.168.0.111:3000/cliente', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

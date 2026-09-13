@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js'; // injeção do serviço prisma para comunicação com o BD
 import { CreateMedicoDto } from './dto/create-medico.dto.js';
 import { UpdateMedicoDto } from './dto/update-medico.dto.js';
@@ -13,6 +13,27 @@ export class MedicoService {
     
     if (!cpf.isValid(createMedicoDto.cpf)){
       throw new BadRequestException("CPF inválido.")
+    }
+
+    const cpfExistente = await this.prisma.medico.findUnique({
+      where: { cpf: createMedicoDto.cpf },
+    });
+
+    if (cpfExistente) {
+      throw new ConflictException('Usuário já está cadastrado.');
+    }
+
+    const crmExistente = await this.prisma.medico.findUnique({
+      where: { 
+        crm_crm_estado: {
+          crm: createMedicoDto.crm,
+          crm_estado: createMedicoDto.crm_estado
+        }
+      },
+    });
+
+    if (crmExistente) {
+      throw new ConflictException('Usuário já está cadastrado.');
     }
 
     return await this.prisma.medico.create({

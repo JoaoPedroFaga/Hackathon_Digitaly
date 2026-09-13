@@ -7,6 +7,8 @@ import { ConsultasModule } from './consultas/consultas.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
+import { WebrtcModule } from './webrtc/webrtc.module.js';
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -17,6 +19,7 @@ import { join } from 'path';
     MedicoModule,
     AdmModule,
     ConsultasModule,
+    WebrtcModule,
   ],
   controllers: [], 
   providers: [],   

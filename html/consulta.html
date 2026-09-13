@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta online | Digitaly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0D10;--elevated:#121417;--text:#F5F7FA;--muted:#A5ACB8;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.16);--cyan:#009FFF;--cyan2:#4CC9FF;--error:#EF4444;--success:#22C55E}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,rgba(0,159,255,.12),transparent 35%),var(--bg);color:var(--text);font-family:Inter,sans-serif;overflow:hidden}
+header{height:72px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(11,13,16,.72);backdrop-filter:blur(20px);position:relative;z-index:10}
+.brand img{width:106px;display:block}.info{text-align:right}.info strong{display:block;font-size:14px}.info span{color:var(--muted);font-size:12px}
+main{height:calc(100vh - 72px);display:flex;align-items:center;justify-content:center;padding:24px}
+.call{width:min(1100px,92vw);height:min(680px,calc(100vh - 150px));min-height:420px;position:relative;border:1px solid rgba(255,255,255,.12);border-radius:24px;overflow:hidden;background:#080A0D;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+#remoteVideo{width:100%;height:100%;object-fit:cover;background:radial-gradient(circle,#1B1E23,#0B0D10 65%)}
+.waiting{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;pointer-events:none}
+.waiting-icon{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);font-size:25px}
+.waiting strong{font-size:16px}.waiting span{color:var(--muted);font-size:13px}
+.self{position:absolute;right:34px;bottom:112px;width:210px;height:145px;z-index:4;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.18);background:#080A0D;box-shadow:0 14px 40px rgba(0,0,0,.45)}
+#localVideo{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}.self-label{position:absolute;left:10px;bottom:9px;padding:5px 9px;border-radius:999px;background:rgba(11,13,16,.72);color:var(--text);font-size:11px}
+.status{position:absolute;top:18px;left:18px;z-index:5;display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(11,13,16,.72);backdrop-filter:blur(12px);color:var(--muted);font-size:12px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 12px rgba(34,197,94,.7)}
+.controls{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:6;display:flex;gap:10px;padding:10px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(18,20,23,.82);backdrop-filter:blur(20px);box-shadow:0 14px 40px rgba(0,0,0,.28)}
+button{width:46px;height:46px;border:1px solid var(--border2);border-radius:50%;background:rgba(255,255,255,.05);color:var(--text);cursor:pointer;font-size:18px;transition:.18s}
+button:hover{border-color:rgba(0,159,255,.5);background:rgba(0,159,255,.1)}
+.home-link{width:46px;height:46px;display:grid;place-items:center;border:1px solid var(--border2);border-radius:50%;background:rgba(255,255,255,.05);color:var(--text);text-decoration:none;font-size:22px;transition:.18s}
+.home-link:hover{border-color:rgba(0,159,255,.5);background:rgba(0,159,255,.1)}
+button.off{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.35)}button.end{width:52px;height:52px;border:0;background:var(--error);color:white}
+.toast{position:fixed;top:90px;left:50%;transform:translate(-50%,-12px);opacity:0;padding:11px 16px;border-radius:999px;background:#1B1E23;border:1px solid var(--border2);font-size:13px;transition:.2s;z-index:30}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:700px){header{height:62px;padding:0 16px}.brand img{width:88px}.info span{display:none}main{height:calc(100vh - 62px);padding:12px}.call{width:100%;height:calc(100vh - 138px);min-height:360px;border-radius:18px}.self{right:18px;bottom:104px;width:125px;height:88px;border-radius:12px}.controls{bottom:18px}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand"><img src="https://digitaly.tech/wp-content/uploads/2026/06/logo_digitaly_branca-scaled.png" alt="Digitaly"></div>
+<div class="info"><strong>Consulta online</strong><span id="consultationStatus">Preparando chamada...</span></div>
+</header>
+<main>
+<section class="call">
+<video id="remoteVideo" autoplay playsinline></video>
+<div class="waiting" id="waiting">
+<div class="waiting-icon">◉</div>
+<strong>Aguardando o outro participante</strong>
+<span>A chamada aparecerá aqui quando a conexão for estabelecida.</span>
+</div>
+<div class="status"><span class="dot"></span><span id="statusText">Preparando chamada</span></div>
+<div class="self"><video id="localVideo" autoplay muted playsinline></video><span class="self-label">Você</span></div>
+<div class="controls">
+<button id="micBtn" title="Microfone" type="button">🎤</button>
+<button id="cameraBtn" title="Câmera" type="button">📷</button>
+<button id="endBtn" class="end" title="Encerrar chamada" type="button">☎</button>
+<a href="cliente.html" class="home-link" title="Voltar para a página principal" aria-label="Voltar para a página principal">⌂</a>
+</div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/webrtc.js"></script>
+
+</body>
+</html>

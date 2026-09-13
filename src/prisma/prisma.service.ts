@@ -14,8 +14,7 @@ export default defineConfig({
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
-    
-    console.log("URL DO BANCO CARREGADA:", process.env.DATABASE_URL);
+  
     const { Pool } = pg;
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
     const adapter = new PrismaPg(pool);
