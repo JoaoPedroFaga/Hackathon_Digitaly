@@ -45,23 +45,14 @@ h1{font-family:var(--fonte-display);font-weight:100;font-size:28px;margin-bottom
     <p class="sub" id="infoConsulta">Processando informações da chamada...</p>
 
     <div class="secao">
-      <h3>Queixa Principal / Motivo</h3>
-      <p id="txtMotivo">Carregando...</p>
-    </div>
-
-    <div class="secao">
-      <h3>Insights e Análise da IA</h3>
-      <p id="txtInsights">A IA está gerando o resumo clínico com base na transcrição do áudio...</p>
-    </div>
-
-    <div class="secao">
-      <h3>Conduta Sugerida</h3>
-      <p id="txtConduta">Carregando recomendações...</p>
+      <h3>Resumo Clínico da IA</h3>
+      <p id="txtResumoIA">Carregando resumo gerado pela inteligência artificial...</p>
     </div>
 
     <div style="margin-top:30px;display:flex;justify-content:flex-end;">
       <a href="medico.html" class="btn">Voltar para a Agenda</a>
     </div>
+  </div>
   </div>
 </div>
 
@@ -80,11 +71,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       const consulta = await resposta.json();
       
       document.getElementById('infoConsulta').textContent = `Consulta ID #${consulta.id} · Data: ${consulta.data} às ${consulta.hora}`;
-      document.getElementById('txtMotivo').textContent = consulta.motivo || 'Não especificado';
-      
-      // Simulação do texto gerado pela IA (você pode plugar sua API de IA aqui futuramente)
-      document.getElementById('txtInsights').textContent = `Paciente relatou sintomas compatíveis com o quadro informado (${consulta.sintomas || 'sem sintomas descritos'}). A dinâmica da chamada ocorreu sem intercorrências técnicas.`;
-      document.getElementById('txtConduta').textContent = consulta.relatorio || 'Orientado repouso, manutenção de hábitos saudáveis e retorno caso os sintomas persistam.';
+      document.getElementById('txtResumoIA').textContent = consulta.relatorio || 'Nenhum resumo gerado para esta consulta.';
     }
   } catch (e) {
     console.error("Erro ao carregar resumo:", e);

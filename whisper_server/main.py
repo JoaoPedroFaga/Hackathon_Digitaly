@@ -118,7 +118,7 @@ async def transcribe(
 
 
 @app.post("/ai")
-async def process_ai(request: PromptRequest):
+async def process_ai(request: TextsRequest):
     try:
         texto = request.text.strip()
 

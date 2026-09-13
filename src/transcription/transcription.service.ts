@@ -34,7 +34,7 @@ export class TranscriptionService {
       text?: string;
     };
 
-    return result.text?.trim() ?? '';
+    return result.text?.trim() ?? '' + '\n\n';
   }
 
   // ENVIA OS TEXTOS PARA A IA E RECEBE OUTROS TEXTOS
