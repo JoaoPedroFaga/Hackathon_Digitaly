@@ -40,4 +40,9 @@ export class MedicoController {
   ) {
     return this.medicoService.remove(crm, crm_estado);
   }
+
+  @Post('login')
+  login(@Body() credenciais: { email: string; senha: string }) {
+    return this.medicoService.login(credenciais.email, credenciais.senha);
+  }
 }

@@ -1,11 +1,6 @@
-import { IsDate, IsString, IsNotEmpty, IsPositive, Length, IsInt } from 'class-validator';
+import { IsDate, IsString, IsNotEmpty, IsPositive, Length, IsInt, IsDateString } from 'class-validator';
 
 export class CreateConsultaDto {
-
-    @IsNotEmpty()
-    @IsInt()
-    id : number;
-
     @IsNotEmpty()
     @IsString()
     @Length(1,11)
@@ -17,7 +12,7 @@ export class CreateConsultaDto {
     medico : string;
 
     @IsNotEmpty()
-    @IsDate()
+    @IsString()
     @Length(1,10)
     data : string;
 

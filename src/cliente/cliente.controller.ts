@@ -31,4 +31,10 @@ export class ClienteController {
   remove(@Param('cpf') cpf: string) {
     return this.clienteService.remove(cpf);
   }
+
+  @Post('login')
+  login(@Body() credenciais: { email: string; senha: string }) {
+    return this.clienteService.login(credenciais.email, credenciais.senha);
+  }
+
 }

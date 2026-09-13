@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { CreateConsultaDto } from './dto/create-consulta.dto.js';
 import { UpdateConsultaDto } from './dto/update-consulta.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -9,6 +9,19 @@ export class ConsultasService {
   constructor(private prisma: PrismaService) {}
 
   async create(createConsultaDto: CreateConsultaDto) {
+
+    const consultaOcupada = await this.prisma.consultas.findFirst({
+      where: {
+        medico: createConsultaDto.medico,
+        data: createConsultaDto.data,
+        hora: createConsultaDto.hora,
+      },
+    });
+
+    if (consultaOcupada) {
+      throw new ConflictException('O médico já possui uma consulta agendada para este dia e horário. Tente escolher outro horário.');
+    }
+
     return await this.prisma.consultas.create({
       data: createConsultaDto,
     });

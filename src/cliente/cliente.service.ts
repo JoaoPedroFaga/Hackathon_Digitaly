@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, ConflictException } from '@nestjs/common';
+import { BadRequestException, Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateClienteDto } from './dto/create-cliente.dto.js';
 import { UpdateClienteDto } from './dto/update-cliente.dto.js';
@@ -49,5 +49,26 @@ export class ClienteService {
     return this.prisma.cliente.delete({
       where: { cpf },
     });
+  }
+
+  async login(email: string, senhaDigitada: string) {
+    // Busca o cliente pelo e-mail
+    const cliente = await this.prisma.cliente.findFirst({
+      where: { email: email },
+    });
+
+    // Se não achar o e-mail ou a senha estiver errada, barra o acesso
+    if (!cliente || cliente.senha !== senhaDigitada) {
+      throw new UnauthorizedException('E-mail ou senha incorretos.');
+    }
+
+    // Se deu certo, devolve o CPF para o frontend salvar no localStorage
+    return {
+      mensagem: 'Login aprovado',
+      cpf: cliente.cpf,
+      nome: cliente.nome, 
+      sobrenome: cliente.sobrenome, 
+      email: cliente.email 
+    };
   }
 }

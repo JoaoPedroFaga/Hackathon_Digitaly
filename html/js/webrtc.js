@@ -27,6 +27,7 @@
   const cameraBtn = document.getElementById("cameraBtn");
   const endBtn = document.getElementById("endBtn");
 
+
   let localStream = null;
   let peerConnection = null;
   let roomId = new URLSearchParams(window.location.search).get("id");
@@ -35,6 +36,9 @@
   let endedLocally = false;
   let makingOffer = false;
   let pendingCandidates = [];
+  let audioRecorder = null;
+  let audioSequence = 0;
+  let audioRecording = false;
 
   // Se consulta.html for aberta sem ?id=..., cria uma sala temporária.
   if (!roomId) {
@@ -42,6 +46,178 @@
       .replace(/-/g, "")
       .slice(0, 20);
     console.warn("Nenhum id de sala foi informado. Sala temporária:", roomId);
+  }
+
+  function iniciarCapturaAudio() {
+    if (!localStream) {
+      console.warn("localStream ainda não disponível.");
+      return;
+    }
+
+    const audioTracks = localStream.getAudioTracks();
+
+    if (!audioTracks.length) {
+      console.warn("Nenhuma faixa de áudio encontrada.");
+      return;
+    }
+
+    const audioStream = new MediaStream(audioTracks);
+
+    let mimeType = "";
+
+    if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+      mimeType = "audio/webm;codecs=opus";
+    } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+      mimeType = "audio/webm";
+    } else {
+      console.error("Este navegador não suporta gravação WebM.");
+      return;
+    }
+
+    audioRecording = true;
+
+    function gravarBloco() {
+      // Se a gravação foi interrompida, não cria outro recorder.
+      if (!audioRecording) {
+        return;
+      }
+
+      const chunks = [];
+
+      const sequence = audioSequence++;
+      const inicio = Date.now();
+
+      let recorder;
+
+      try {
+        recorder = new MediaRecorder(audioStream, {
+          mimeType,
+        });
+      } catch (error) {
+        console.error("Erro ao criar MediaRecorder:", error);
+        audioRecording = false;
+        return;
+      }
+
+      audioRecorder = recorder;
+
+      recorder.onstart = () => {
+        console.log(
+          `[AUDIO] Gravação iniciada. seq=${sequence}`
+        );
+      };
+
+      recorder.ondataavailable = event => {
+        if (event.data && event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      recorder.onerror = event => {
+        console.error(
+          `[AUDIO] Erro no MediaRecorder seq=${sequence}:`,
+          event.error
+        );
+      };
+
+      recorder.onstop = () => {
+        const duracao = Date.now() - inicio;
+
+        console.log(
+          `[AUDIO] Gravação finalizada. seq=${sequence} duração=${duracao}ms`
+        );
+
+        /*
+        * Só agora montamos o Blob.
+        *
+        * Como o recorder foi iniciado e depois parado,
+        * esse Blob representa uma gravação WebM completa.
+        */
+        if (chunks.length > 0) {
+          const blob = new Blob(chunks, {
+            type: mimeType,
+          });
+
+          console.log(
+            `[AUDIO] Bloco completo seq=${sequence}:`,
+            Math.round(blob.size / 1024),
+            "KB"
+          );
+
+          enviarAudioParaBackend(blob);
+        } else {
+          console.warn(
+            `[AUDIO] Nenhum dado gravado no bloco seq=${sequence}`
+          );
+        }
+
+        audioRecorder = null;
+
+        /*
+        * Começa um NOVO recorder somente depois que
+        * o anterior terminou.
+        */
+        if (audioRecording) {
+          setTimeout(() => {
+            gravarBloco();
+          }, 50);
+        }
+      };
+
+      try {
+        recorder.start();
+
+        /*
+        * Este recorder fica aberto por 5 segundos.
+        * Depois é encerrado explicitamente.
+        */
+        setTimeout(() => {
+          if (
+            recorder &&
+            recorder.state !== "inactive"
+          ) {
+            recorder.stop();
+          }
+        }, 5000);
+
+      } catch (error) {
+        console.error(
+          `[AUDIO] Erro ao iniciar gravação seq=${sequence}:`,
+          error
+        );
+
+        audioRecorder = null;
+        audioRecording = false;
+      }
+    }
+
+    console.log(
+      `[AUDIO] Iniciando captura contínua. MIME=${mimeType}`
+    );
+
+    gravarBloco();
+  }
+  
+  function enviarAudioParaBackend(blob) {
+    if (!socket.connected) {
+      console.warn("Socket desconectado. Bloco de áudio descartado.");
+      return;
+    }
+
+    const sequence = audioSequence++;
+
+    socket.emit("audio_chunk", {
+      roomId,
+      sequence,
+      timestamp: Date.now(),
+      audio: blob,
+    });
+
+    console.log(
+      `Bloco de áudio #${sequence} enviado:`,
+      Math.round(blob.size / 1024),
+      "KB",
+    );
   }
 
   function msg(text) {
@@ -132,6 +308,8 @@
       });
 
       localVideo.srcObject = localStream;
+
+      iniciarCapturaAudio();
 
       setStatus("Aguardando participante", "Sala: " + roomId);
       msg("Câmera e microfone ativados");
@@ -427,7 +605,12 @@
     get socketId() { return socket.id; },
     get localStream() { return localStream; },
     get peerConnection() { return peerConnection; },
+
     restart: reiniciarChamada,
-    end: encerrarChamada
+    end: encerrarChamada,
+
+    processarIA: () => {
+      socket.emit("processar_ia");
+    }
   };
 })();

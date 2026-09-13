@@ -107,7 +107,7 @@ form{display:flex;flex-direction:column;gap:var(--s-5)}
 <script>
 const API_URL = 'https://192.168.0.111:3000';
 
-document.getElementById('formLogin').addEventListener('submit', function(e){
+document.getElementById('formLogin').addEventListener('submit', async function(e){
   e.preventDefault();
 
   const campos = {
@@ -145,15 +145,72 @@ document.getElementById('formLogin').addEventListener('submit', function(e){
     campos.senha.value.length > 0
   );
 
-  if(valido){
-    let tipo_cliente = ""
-    
-    
+if(valido){
+    const credenciais = {
+      email: campos.email.value.trim(),
+      senha: campos.senha.value
+    };
 
+    const configFetch = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credenciais)
+    };
 
+try {
+      // 1. Tenta validar na tabela de Clientes
+      let resposta = await fetch(`${API_URL}/cliente/login`, configFetch);
+      if (resposta.ok) {
+        const dados = await resposta.json(); // Extrai os dados enviados pelo NestJS
+        localStorage.setItem('usuarioLogado', 'true');
+        localStorage.setItem('tipoUsuario', 'cliente');
+        localStorage.setItem('cpfUsuario', dados.cpf); // Salva o CPF
+        localStorage.setItem('nomeUsuario', dados.nome);
+        localStorage.setItem('sobrenomeUsuario', dados.sobrenome);
+        localStorage.setItem('emailUsuario', dados.email);
+        window.location.href = 'cliente.html';
+        return; 
+      }
 
+      // 2. Se falhou no cliente, tenta na tabela de Médicos
+      resposta = await fetch(`${API_URL}/medico/login`, configFetch);
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        localStorage.setItem('usuarioLogado', 'true');
+        localStorage.setItem('tipoUsuario', 'medico');
+        localStorage.setItem('cpfUsuario', dados.cpf); // Salva o CPF
+        localStorage.setItem('nomeUsuario', dados.nome);
+        localStorage.setItem('sobrenomeUsuario', dados.sobrenome);
+        localStorage.setItem('emailUsuario', dados.email);
+        window.location.href = 'medico.html';
+        return;
+      }
 
-    window.location.href = 'cliente.html';
+      // 3. Se falhou no médico, tenta na tabela de Administradores
+      resposta = await fetch(`${API_URL}/adm/login`, configFetch);
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        localStorage.setItem('usuarioLogado', 'true');
+        localStorage.setItem('tipoUsuario', 'adm');
+        localStorage.setItem('cpfUsuario', dados.cpf); // Salva o CPF
+        localStorage.setItem('nomeUsuario', dados.nome);
+        localStorage.setItem('sobrenomeUsuario', dados.sobrenome);
+        localStorage.setItem('emailUsuario', dados.email);
+        window.location.href = 'adm.html';
+        return;
+      }
+
+      // Se o código chegou até aqui, as 3 tentativas retornaram erro
+      campos.email.classList.add('erro');
+      campos.senha.classList.add('erro');
+      const ajudaSenha = document.getElementById('ajudaSenha');
+      ajudaSenha.textContent = 'E-mail ou senha incorretos.';
+      ajudaSenha.classList.add('erro');
+
+    } catch (erro) {
+      console.error(erro);
+      alert('Falha ao conectar com o servidor.');
+    }
   }
 });
 

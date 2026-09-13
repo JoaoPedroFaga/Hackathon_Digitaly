@@ -8,6 +8,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
 import { WebrtcModule } from './webrtc/webrtc.module.js';
+import { VerificacaoModule } from './verificacao/verificacao.module.js';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { WebrtcModule } from './webrtc/webrtc.module.js';
     AdmModule,
     ConsultasModule,
     WebrtcModule,
+    VerificacaoModule,
   ],
   controllers: [], 
   providers: [],   

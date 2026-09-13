@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, ConflictException } from '@nestjs/common';
+import { BadRequestException, Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js'; // injeção do serviço prisma para comunicação com o BD
 import { CreateMedicoDto } from './dto/create-medico.dto.js';
 import { UpdateMedicoDto } from './dto/update-medico.dto.js';
@@ -74,5 +74,26 @@ export class MedicoService {
       },
      },
     });
+  }
+
+  async login(email: string, senhaDigitada: string) {
+    // Busca o medico pelo e-mail
+    const medico = await this.prisma.medico.findFirst({
+      where: { email: email },
+    });
+
+    // Se não achar o e-mail ou a senha estiver errada, barra o acesso
+    if (!medico || medico.senha !== senhaDigitada) {
+      throw new UnauthorizedException('E-mail ou senha incorretos.');
+    }
+
+    // Se deu certo, devolve o CPF para o frontend salvar no localStorage
+    return {
+      mensagem: 'Login aprovado',
+      cpf: medico.cpf,
+      nome: medico.nome, 
+      sobrenome: medico.sobrenome, 
+      email: medico.email
+    };
   }
 }

@@ -57,6 +57,70 @@ button.off{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.35)}butto
 </main>
 <div class="toast" id="toast"></div>
 
+<script>
+const API_URL = 'https://192.168.0.111:3000';
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const consultaId = urlParams.get('id');
+  const tipoUsuario = localStorage.getItem('tipoUsuario');
+
+  if (!consultaId || !tipoUsuario) return;
+
+  const payload = tipoUsuario === 'medico' 
+    ? { medico_conectado: true } 
+    : { cliente_conectado: true };
+
+  try {
+    await fetch(`${API_URL}/consultas/${consultaId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (erro) {
+    console.error("Erro ao atualizar status de conexão:", erro);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const homeLink = document.querySelector('.home-link');
+  
+  if (homeLink) {
+    homeLink.addEventListener('click', async (e) => {
+
+       window.digitalyWebRTC.processarIA();
+
+      e.preventDefault(); // Pausa o redirecionamento imediato para salvar no banco
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const consultaId = urlParams.get('id');
+      const tipoUsuario = localStorage.getItem('tipoUsuario');
+
+      if (consultaId) {
+        try {
+          // Marca a consulta como finalizada no banco
+          await fetch(`${API_URL}/consultas/${consultaId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ finalizada: true })
+          });
+        } catch (erro) {
+          console.error("Erro ao finalizar consulta ao sair:", erro);
+        }
+      }
+
+      // Redireciona para o painel correto de acordo com o tipo de usuário
+      if (tipoUsuario === 'medico') {
+        window.location.href = 'medico.html';
+      } else {
+        window.location.href = 'cliente.html';
+      }
+    });
+  }
+});
+
+</script>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/webrtc.js"></script>
 

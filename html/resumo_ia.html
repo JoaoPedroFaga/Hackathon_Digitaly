@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resumo da IA · Digitaly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --grafite-950:#0B0D10; --grafite-900:#121417; --grafite-800:#1B1E23;
+  --grafite-700:#262A31; --grafite-500:#5B6270; --grafite-50:#F5F7FA;
+  --celeste-500:#009FFF; --celeste-400:#33B3FF;
+  --grad-marca:linear-gradient(135deg,#009FFF 0%,#4CC9FF 100%);
+  --fonte-display:'Inter',system-ui,sans-serif;
+  --fonte-texto:'Inter',system-ui,sans-serif;
+  --fonte-dados:'IBM Plex Sans',system-ui,sans-serif;
+  --r-md:12px; --r-lg:16px; --r-pill:999px;
+  --borda:rgba(255,255,255,.08); --borda-forte:rgba(255,255,255,.16);
+  --bg:var(--grafite-950); --bg-elev:var(--grafite-900);
+  --texto:var(--grafite-50); --texto-2:#A5ACB8; --texto-3:var(--grafite-500);
+  --verde:#35D07F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fonte-texto);font-size:15px;line-height:1.6;color:var(--texto);background:var(--bg);min-height:100vh;padding:40px 20px}
+.container{width:min(800px, 100%);margin:0 auto}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--fonte-display);font-weight:500;font-size:17px;color:var(--texto);margin-bottom:30px;text-decoration:none}
+.logo i{width:22px;height:22px;border-radius:6px;background:var(--grad-marca);display:inline-block}
+.card{background:var(--bg-elev);border:1px solid var(--borda);border-radius:var(--r-lg);padding:28px;margin-bottom:20px}
+h1{font-family:var(--fonte-display);font-weight:100;font-size:28px;margin-bottom:8px}
+.sub{color:var(--texto-2);font-size:13px;margin-bottom:24px}
+.secao{margin-bottom:20px}
+.secao h3{font-size:15px;color:var(--celeste-400);margin-bottom:8px;font-family:var(--fonte-dados)}
+.secao p{color:var(--texto);font-size:14px;background:rgba(255,255,255,.02);border:1px solid var(--borda);padding:14px;border-radius:var(--r-md)}
+.btn{display:flex;align-items:center;justify-content:center;min-height:46px;padding:0 24px;border-radius:var(--r-pill);font-weight:500;font-size:14px;border:0;cursor:pointer;background:var(--grad-marca);color:#fff;text-decoration:none;transition:.2s}
+.btn:hover{box-shadow:0 0 0 1px rgba(0,159,255,.35),0 12px 40px rgba(0,159,255,.22)}
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="medico.html" class="logo"><i></i>Digitaly</a>
+  
+  <div class="card">
+    <h1>Resumo Inteligente da Consulta</h1>
+    <p class="sub" id="infoConsulta">Processando informações da chamada...</p>
+
+    <div class="secao">
+      <h3>Queixa Principal / Motivo</h3>
+      <p id="txtMotivo">Carregando...</p>
+    </div>
+
+    <div class="secao">
+      <h3>Insights e Análise da IA</h3>
+      <p id="txtInsights">A IA está gerando o resumo clínico com base na transcrição do áudio...</p>
+    </div>
+
+    <div class="secao">
+      <h3>Conduta Sugerida</h3>
+      <p id="txtConduta">Carregando recomendações...</p>
+    </div>
+
+    <div style="margin-top:30px;display:flex;justify-content:flex-end;">
+      <a href="medico.html" class="btn">Voltar para a Agenda</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://192.168.0.111:3000';
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const consultaId = urlParams.get('id');
+
+  if (!consultaId) return;
+
+  try {
+    const resposta = await fetch(`${API_URL}/consultas/${consultaId}`);
+    if (resposta.ok) {
+      const consulta = await resposta.json();
+      
+      document.getElementById('infoConsulta').textContent = `Consulta ID #${consulta.id} · Data: ${consulta.data} às ${consulta.hora}`;
+      document.getElementById('txtMotivo').textContent = consulta.motivo || 'Não especificado';
+      
+      // Simulação do texto gerado pela IA (você pode plugar sua API de IA aqui futuramente)
+      document.getElementById('txtInsights').textContent = `Paciente relatou sintomas compatíveis com o quadro informado (${consulta.sintomas || 'sem sintomas descritos'}). A dinâmica da chamada ocorreu sem intercorrências técnicas.`;
+      document.getElementById('txtConduta').textContent = consulta.relatorio || 'Orientado repouso, manutenção de hábitos saudáveis e retorno caso os sintomas persistam.';
+    }
+  } catch (e) {
+    console.error("Erro ao carregar resumo:", e);
+  }
+});
+</script>
+</body>
+</html>

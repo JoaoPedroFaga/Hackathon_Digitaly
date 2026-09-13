@@ -251,6 +251,13 @@ h1{
   border:1px solid var(--borda-forte);
 }
 .btn-secundario:hover{border-color:var(--celeste-500);text-decoration:none}
+.btn-primario{
+  background:var(--grad-marca);
+  color:#fff;
+}
+.btn-primario:hover{
+  box-shadow:0 0 0 1px rgba(0,159,255,.35),0 12px 40px rgba(0,159,255,.22);
+}
 
 /* Lateral */
 .info-linha{
@@ -347,7 +354,42 @@ h1{
   .consulta{align-items:flex-start;flex-direction:column}
   .consulta .btn{width:100%}
 }
+.dia.consulta-finalizada{
+  background:rgba(53,208,127,.12);
+  border-color:rgba(53,208,127,.45);
+  color:var(--texto);
+}
+.dia .ponto-finalizado{
+  display:block;
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--verde);
+  box-shadow:0 0 7px rgba(53,208,127,.7);
+}
+.legenda .bolinha.finalizada{
+  background:var(--verde);
+  box-shadow:0 0 7px rgba(53,208,127,.7);
+}
+.consulta-data.finalizada{
+  color:var(--texto-3);
+}
+.status.finalizado{
+  color:var(--verde);
+}
+.status.finalizado i{
+  background:var(--verde);
+}
 </style>
+
+<script>
+  const usuarioLogado = localStorage.getItem('usuarioLogado');
+  const tipoUsuario = localStorage.getItem('tipoUsuario');
+
+  if (!usuarioLogado || tipoUsuario !== 'medico') {
+    window.location.href = 'login.html';
+  }
+</script>
+
 </head>
 
 <body>
@@ -357,7 +399,7 @@ h1{
 <header class="topo">
   <div>
     <span class="tag"><i></i>Área do médico</span>
-    <h1>Olá, Dr. Carlos!</h1>
+    <h1>Olá, Dr(a)!</h1>
     <p class="subtitulo">Acompanhe sua agenda e os próximos atendimentos.</p>
   </div>
 </header>
@@ -367,7 +409,7 @@ h1{
   <div class="modal-consulta" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
     <div class="modal-cabecalho">
       <div>
-        <span class="tag"><i></i>Consulta agendada</span>
+        <span class="tag"><i></i>Detalhes da consulta</span>
         <h2 id="modalTitulo">Dados do cliente</h2>
         <p id="modalSubtitulo">Confira as informações antes de iniciar o atendimento.</p>
       </div>
@@ -381,19 +423,14 @@ h1{
       </section>
 
       <section class="modal-secao">
-        <h3>Pré-consulta</h3>
+        <h3>Pré-consulta (Relato do Paciente)</h3>
         <div class="pre-consulta" id="preConsulta"></div>
-      </section>
-
-      <section class="modal-secao">
-        <h3>Histórico de atendimentos</h3>
-        <div id="historicoAtendimentos"></div>
       </section>
     </div>
 
     <div class="modal-rodape">
       <button class="btn btn-secundario" id="cancelarConsulta">Fechar</button>
-      <button class="btn btn-primario" id="entrarTeleatendimento">Entrar no teleatendimento</button>
+      <button class="btn btn-primario" id="btnEntrarModal">Entrar no teleatendimento</button>
     </div>
   </div>
 </div>
@@ -419,49 +456,34 @@ h1{
 
       <div class="legenda">
         <span><i class="bolinha"></i> Consulta com cliente</span>
+        <span><i class="bolinha finalizada"></i> Finalizada</span>
         <span><i class="bolinha hj"></i> Hoje</span>
       </div>
     </div>
 
-    <div class="card consultas">
+    <!-- Próximos Clientes (Em cima) -->
+    <div class="card consultas" style="margin-top: 20px;">
       <div class="card-titulo">
         <div>
           <h2>Próximos clientes</h2>
           <p>Seus próximos atendimentos agendados.</p>
         </div>
       </div>
-
-      <div class="consulta">
-        <div class="consulta-info">
-          <div class="consulta-data">12 DE SETEMBRO · 14:00</div>
-          <h3>João da Silva</h3>
-          <p>Consulta de acompanhamento · Teleatendimento</p>
-          <span class="status"><i></i> Agendada</span>
-        </div>
-        <button class="btn btn-secundario" onclick="abrirConsulta('João da Silva')">
-          Entrar na consulta
-        </button>
+      <div id="listaConsultasFuturas">
+        <p style="color:var(--texto-3);font-size:13px;padding:10px 0;">Carregando agenda...</p>
       </div>
+    </div>
 
-      <div class="consulta">
-        <div class="consulta-info">
-          <div class="consulta-data">18 DE SETEMBRO · 10:30</div>
-          <h3>Maria Oliveira</h3>
-          <p>Consulta de retorno · Presencial</p>
-          <span class="status"><i></i> Agendada</span>
+    <!-- Histórico de Atendimentos (Embaixo) -->
+    <div class="card consultas" style="margin-top: 20px;">
+      <div class="card-titulo">
+        <div>
+          <h2>Histórico de atendimentos</h2>
+          <p>Consultas finalizadas e resumos da IA.</p>
         </div>
       </div>
-
-      <div class="consulta">
-        <div class="consulta-info">
-          <div class="consulta-data">21 DE SETEMBRO · 16:00</div>
-          <h3>Pedro Santos</h3>
-          <p>Primeira consulta · Teleatendimento</p>
-          <span class="status"><i></i> Agendada</span>
-        </div>
-        <button class="btn btn-secundario" onclick="abrirConsulta('Pedro Santos')">
-          Entrar na consulta
-        </button>
+      <div id="listaConsultasFinalizadas">
+        <p style="color:var(--texto-3);font-size:13px;padding:10px 0;">Carregando histórico...</p>
       </div>
     </div>
   </section>
@@ -477,15 +499,11 @@ h1{
 
       <div class="info-linha">
         <span>Consultas hoje</span>
-        <span>1</span>
+        <span>0</span>
       </div>
       <div class="info-linha">
         <span>Próximas consultas</span>
-        <span>3</span>
-      </div>
-      <div class="info-linha">
-        <span>Teleatendimentos</span>
-        <span>2</span>
+        <span>0</span>
       </div>
     </div>
 
@@ -493,29 +511,22 @@ h1{
       <div class="card-titulo">
         <div>
           <h2>Clientes</h2>
-          <p>Atendimentos agendados no mês.</p>
+          <p>Atendimentos agendados no sistema.</p>
         </div>
       </div>
 
-      <div class="numero">12</div>
-      <div class="numero-legenda">clientes com consulta neste mês</div>
+      <div class="numero">0</div>
+      <div class="numero-legenda">clientes agendados</div>
     </div>
   </aside>
 
 </main>
 
 <script>
-// ============================================================
-// CALENDÁRIO DO MÉDICO
-// ============================================================
-// Estes são dados fictícios para demonstrar a interface.
-// Posteriormente virão do NestJS + Prisma.
-
-const consultasAgendadas = {
-  '2026-09-12': true,
-  '2026-09-18': true,
-  '2026-09-21': true
-};
+const API_URL = 'https://192.168.0.111:3000';
+let consultasAtivasMap = {};       
+let consultasFinalizadasMap = {};  
+let dadosTodasConsultas = {}; // Guarda os dados completos para o modal
 
 let dataCalendario = new Date();
 
@@ -523,12 +534,136 @@ const nomesMeses = [
   'janeiro','fevereiro','março','abril','maio','junho',
   'julho','agosto','setembro','outubro','novembro','dezembro'
 ];
-
 const nomesDias = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 
 function chaveData(ano, mes, dia){
-  return `${ano}-${String(mes + 1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+  return `${String(dia).padStart(2,'0')}/${String(mes + 1).padStart(2,'0')}/${ano}`;
 }
+
+function entrarNaConsulta(consultaId) {
+  localStorage.setItem(`medico_na_sala_${consultaId}`, 'true');
+  window.location.href = `consulta.html?id=${consultaId}`;
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const nomeMedico = localStorage.getItem('nomeUsuario');
+  const cpfLogado = localStorage.getItem('cpfUsuario');
+  
+  if (nomeMedico) {
+    document.querySelector('.topo h1').textContent = `Olá, Dr(a). ${nomeMedico.split(' ')[0]}!`;
+  }
+
+  try {
+    const [respostaConsultas, respostaClientes] = await Promise.all([
+      fetch(`${API_URL}/consultas`),
+      fetch(`${API_URL}/cliente`) 
+    ]);
+
+    if (respostaConsultas.ok && respostaClientes.ok) {
+      const todasConsultas = await respostaConsultas.json();
+      const todosClientes = await respostaClientes.json();
+      
+      const clientesPorCpf = {};
+      todosClientes.forEach(cli => {
+        clientesPorCpf[cli.cpf] = cli;
+      });
+
+      // Indexa as consultas por ID para o modal abrir com dados reais
+      todasConsultas.forEach(c => {
+        dadosTodasConsultas[c.id] = { consulta: c, cliente: clientesPorCpf[c.cliente] };
+      });
+
+      const minhasConsultas = todasConsultas.filter(c => c.medico === cpfLogado);
+      const consultasFuturas = minhasConsultas.filter(c => !c.finalizada);
+      const consultasFinalizadas = minhasConsultas.filter(c => c.finalizada);
+      
+      consultasFuturas.forEach(c => consultasAtivasMap[c.data] = true);
+      consultasFinalizadas.forEach(c => consultasFinalizadasMap[c.data] = true);
+
+      // 1. Renderiza Próximos Clientes (Em cima)
+      const listaFuturas = document.getElementById('listaConsultasFuturas');
+      listaFuturas.innerHTML = '';
+      
+      let consultasHojeCount = 0;
+      const hoje = new Date();
+      const dataHojeString = chaveData(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+
+      if (consultasFuturas.length === 0) {
+        listaFuturas.innerHTML = '<p style="color:var(--texto-3);font-size:13px;padding:10px 0;">Nenhuma consulta agendada.</p>';
+      } else {
+        consultasFuturas.forEach(consulta => {
+          if (consulta.data === dataHojeString) consultasHojeCount++;
+
+          const [dia, mes, ano] = consulta.data.split('/');
+          const mesNome = nomesMeses[parseInt(mes) - 1].toUpperCase();
+
+          const cliente = clientesPorCpf[consulta.cliente];
+          const nomeExibicao = cliente ? `${cliente.nome} ${cliente.sobrenome}` : `CPF: ${consulta.cliente}`;
+
+          const card = document.createElement('div');
+          card.className = 'consulta';
+          card.innerHTML = `
+            <div class="consulta-info">
+              <div class="consulta-data">${dia} DE ${mesNome} · ${consulta.hora}</div>
+              <h3>${nomeExibicao}</h3>
+              <p>Motivo: ${consulta.motivo}</p>
+              <span class="status"><i></i> Agendada</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-secundario" onclick="abrirDetalhes(${consulta.id})">Ver Detalhes</button>
+              <button class="btn btn-primario" onclick="entrarNaConsulta(${consulta.id})">Entrar</button>
+            </div>
+          `;
+          listaFuturas.appendChild(card);
+        });
+      }
+
+      // 2. Renderiza Histórico de Atendimentos Finalizados (Embaixo)
+      const listaFinalizadas = document.getElementById('listaConsultasFinalizadas');
+      listaFinalizadas.innerHTML = '';
+
+      if (consultasFinalizadas.length === 0) {
+        listaFinalizadas.innerHTML = '<p style="color:var(--texto-3);font-size:13px;padding:10px 0;">Nenhum atendimento finalizado.</p>';
+      } else {
+        consultasFinalizadas.forEach(consulta => {
+          const [dia, mes, ano] = consulta.data.split('/');
+          const mesNome = nomesMeses[parseInt(mes) - 1].toUpperCase();
+
+          const cliente = clientesPorCpf[consulta.cliente];
+          const nomeExibicao = cliente ? `${cliente.nome} ${cliente.sobrenome}` : `CPF: ${consulta.cliente}`;
+
+          const card = document.createElement('div');
+          card.className = 'consulta';
+          card.innerHTML = `
+            <div class="consulta-info">
+              <div class="consulta-data finalizada">${dia} DE ${mesNome} · ${consulta.hora}</div>
+              <h3>${nomeExibicao}</h3>
+              <p>Motivo: ${consulta.motivo}</p>
+              <span class="status finalizado"><i></i> Atendimento finalizado</span>
+            </div>
+            <button class="btn btn-secundario" onclick="window.location.href='resumo_ia.html?id=${consulta.id}'">
+              Ver resumo da IA
+            </button>
+          `;
+          listaFinalizadas.appendChild(card);
+        });
+      }
+
+      const spansInfo = document.querySelectorAll('.info-linha span');
+      if (spansInfo.length >= 4) {
+        spansInfo[1].textContent = consultasHojeCount; 
+        spansInfo[3].textContent = consultasFuturas.length; 
+      }
+      document.querySelector('.numero').textContent = minhasConsultas.length; 
+    }
+  } catch (erro) {
+    console.error("Erro ao buscar dados: ", erro);
+    document.getElementById('listaConsultasFuturas').innerHTML = 
+      '<p style="color:var(--vermelho);font-size:13px;padding:10px 0;">Erro ao carregar a agenda.</p>';
+  }
+
+  renderizarCalendario();
+});
 
 function renderizarCalendario(){
   const calendario = document.getElementById('calendario');
@@ -572,10 +707,13 @@ function renderizarCalendario(){
       elemento.classList.add('hoje');
     }
 
-    if(consultasAgendadas[chave]){
+    if(consultasAtivasMap[chave]){
       elemento.classList.add('consulta');
       elemento.innerHTML = `${dia}<span class="ponto"></span>`;
-    }else{
+    } else if(consultasFinalizadasMap[chave]){
+      elemento.classList.add('consulta-finalizada');
+      elemento.innerHTML = `${dia}<span class="ponto-finalizado"></span>`;
+    } else {
       elemento.textContent = dia;
     }
 
@@ -593,92 +731,56 @@ document.getElementById('mesProximo').addEventListener('click', () => {
   renderizarCalendario();
 });
 
-renderizarCalendario();
-
 // ============================================================
-// CONSULTA · DETALHES DO CLIENTE
+// MODAL DE DETALHES DA CONSULTA
 // ============================================================
+let consultaAtualModalId = null;
 
-const dadosClientes = {
-  'João da Silva': {
-    data: '12 de setembro de 2026 · 14:00',
-    tipo: 'Consulta de acompanhamento · Teleatendimento',
-    dados: [
-      ['Nome completo', 'João da Silva'],
-      ['Data de nascimento', '14/05/1992'],
-      ['CPF', '123.456.789-00'],
-      ['Telefone', '(16) 99999-1234'],
-      ['E-mail', 'joao.silva@email.com'],
-      ['Convênio', 'Particular']
-    ],
-    preConsulta: [
-      ['Motivo da consulta', 'Acompanhamento de dores de cabeça recorrentes'],
-      ['Quando começaram os sintomas?', 'Há aproximadamente 3 semanas'],
-      ['Está usando alguma medicação?', 'Não'],
-      ['Houve piora desde o último atendimento?', 'Não'],
-      ['Observações do paciente', 'Paciente relata melhora parcial desde o último atendimento.']
-    ],
-    historico: [
-      ['18/08/2026', 'Consulta de acompanhamento', 'Relatada melhora dos sintomas. Orientado retorno em 30 dias.'],
-      ['21/07/2026', 'Consulta inicial', 'Avaliação clínica e definição de acompanhamento.'],
-      ['04/06/2026', 'Atendimento de rotina', 'Sem alterações relevantes no quadro apresentado.']
-    ]
-  },
-  'Pedro Santos': {
-    data: '21 de setembro de 2026 · 16:00',
-    tipo: 'Primeira consulta · Teleatendimento',
-    dados: [
-      ['Nome completo', 'Pedro Santos'],
-      ['Data de nascimento', '02/11/1988'],
-      ['CPF', '987.654.321-00'],
-      ['Telefone', '(16) 98888-5678'],
-      ['E-mail', 'pedro.santos@email.com'],
-      ['Convênio', 'Unimed']
-    ],
-    preConsulta: [
-      ['Motivo da consulta', 'Avaliação de dores nas costas'],
-      ['Quando começaram os sintomas?', 'Há cerca de 2 meses'],
-      ['Está usando alguma medicação?', 'Analgésico quando necessário'],
-      ['Houve piora desde o último atendimento?', 'Primeiro atendimento'],
-      ['Observações do paciente', 'Dor mais intensa após longos períodos sentado.']
-    ],
-    historico: [
-      ['10/08/2026', 'Atendimento de triagem', 'Queixa registrada e encaminhamento para avaliação médica.'],
-      ['03/05/2026', 'Consulta de rotina', 'Sem alterações relevantes registradas.']
-    ]
-  }
-};
+function abrirDetalhes(consultaId){
+  const dados = dadosTodasConsultas[consultaId];
+  if (!dados) return;
 
-let clienteConsultaAtual = null;
+  consultaAtualModalId = consultaId;
+  const { consulta, cliente } = dados;
 
-function abrirConsulta(cliente){
-  const dados = dadosClientes[cliente] || dadosClientes['João da Silva'];
-  clienteConsultaAtual = cliente;
+  document.getElementById('modalTitulo').textContent = cliente ? `${cliente.nome} ${cliente.sobrenome}` : `CPF: ${consulta.cliente}`;
+  document.getElementById('modalSubtitulo').textContent = `Consulta agendada para ${consulta.data} às ${consulta.hora}`;
 
-  document.getElementById('modalTitulo').textContent = cliente;
-  document.getElementById('modalSubtitulo').textContent = `${dados.data} · ${dados.tipo}`;
-
-  document.getElementById('dadosPaciente').innerHTML = dados.dados.map(([rotulo, valor]) => `
+  // Preenche dados do paciente
+  document.getElementById('dadosPaciente').innerHTML = `
     <div class="dado-paciente">
-      <span>${rotulo}</span>
-      <strong>${valor}</strong>
+      <span>CPF</span>
+      <strong>${consulta.cliente}</strong>
     </div>
-  `).join('');
+    <div class="dado-paciente">
+      <span>E-mail</span>
+      <strong>${cliente ? cliente.email : 'Não informado'}</strong>
+    </div>
+  `;
 
-  document.getElementById('preConsulta').innerHTML = dados.preConsulta.map(([pergunta, resposta]) => `
+  // Preenche o relato da pré-consulta vindo do banco
+  document.getElementById('preConsulta').innerHTML = `
     <div class="pre-consulta-linha">
-      <span>${pergunta}</span>
-      <span>${resposta}</span>
+      <span>Motivo principal</span>
+      <span>${consulta.motivo || 'Não informado'}</span>
     </div>
-  `).join('');
-
-  document.getElementById('historicoAtendimentos').innerHTML = dados.historico.map(([data, tipo, resumo]) => `
-    <div class="historico-item">
-      <span class="historico-data">${data}</span>
-      <strong>${tipo}</strong>
-      <p>${resumo}</p>
+    <div class="pre-consulta-linha">
+      <span>Sintomas relatados</span>
+      <span>${consulta.sintomas || 'Nenhum sintoma descrito'}</span>
     </div>
-  `).join('');
+    <div class="pre-consulta-linha">
+      <span>Medicação em uso</span>
+      <span>${consulta.medicacao || 'Nenhuma'}</span>
+    </div>
+    <div class="pre-consulta-linha">
+      <span>Evolução / Piora</span>
+      <span>${consulta.piora || 'Não informado'}</span>
+    </div>
+    <div class="pre-consulta-linha">
+      <span>Observações extras</span>
+      <span>${consulta.obs || 'Nenhuma'}</span>
+    </div>
+  `;
 
   const modal = document.getElementById('modalConsulta');
   modal.classList.add('aberto');
@@ -691,7 +793,7 @@ function fecharConsulta(){
   modal.classList.remove('aberto');
   modal.setAttribute('aria-hidden','true');
   document.body.style.overflow = '';
-  clienteConsultaAtual = null;
+  consultaAtualModalId = null;
 }
 
 document.getElementById('fecharModal').addEventListener('click', fecharConsulta);
@@ -702,14 +804,13 @@ document.getElementById('modalConsulta').addEventListener('click', (event) => {
 document.addEventListener('keydown', (event) => {
   if(event.key === 'Escape') fecharConsulta();
 });
-document.getElementById('entrarTeleatendimento').addEventListener('click', () => {
-  if(!clienteConsultaAtual) return;
-  // Por enquanto é uma simulação. Futuramente: teleatendimento.html?id=CONSULTA_ID
-  alert(`Abrindo o teleatendimento com ${clienteConsultaAtual}...`);
-});
 
-// Os dados acima são fictícios para demonstrar a interface.
-// Posteriormente virão do NestJS + Prisma.
+// Ação do botão de entrar direto pelo modal
+document.getElementById('btnEntrarModal').addEventListener('click', () => {
+  if (consultaAtualModalId) {
+    entrarNaConsulta(consultaAtualModalId);
+  }
+});
 </script>
 
 </body>

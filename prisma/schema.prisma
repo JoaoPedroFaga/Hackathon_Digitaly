@@ -9,28 +9,27 @@ datasource db {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model adm {
   cpf                    String   @id @db.VarChar(11)
-  email                  String
+  email                  String   @unique(map: "email_unico_adm")
   senha                  String
   medico_medico_admToadm medico[] @relation("medico_admToadm")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model cliente {
-  cpf                                      String        @id @db.VarChar(11)
-  nome                                     String
-  sobrenome                                String
-  tel                                      String        @db.VarChar(11)
-  sexo                                     String
-  email                                    String
-  senha                                    String
-  estado                                   String
-  cidade                                   String
-  rua                                      String
-  numero                                   String
-  nascimento                               String        @db.VarChar(10)
-  complemento                              String?
-  consultas_consultas_clienteTocliente     consultas[]   @relation("consultas_clienteTocliente")
-  verificacao_verificacao_clienteTocliente verificacao[] @relation("verificacao_clienteTocliente")
+  cpf                                  String      @id @db.VarChar(11)
+  nome                                 String
+  sobrenome                            String
+  tel                                  String      @db.VarChar(11)
+  sexo                                 String
+  email                                String      @unique(map: "email_unico")
+  senha                                String
+  estado                               String
+  cidade                               String
+  rua                                  String
+  numero                               String
+  nascimento                           String      @db.VarChar(10)
+  complemento                          String?
+  consultas_consultas_clienteTocliente consultas[] @relation("consultas_clienteTocliente")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -40,7 +39,7 @@ model medico {
   cpf                                String      @unique @db.VarChar(11)
   nome                               String
   sobrenome                          String
-  email                              String
+  email                              String      @unique(map: "email_unico_med")
   senha                              String
   adm                                String      @db.VarChar(11)
   consultas_consultas_medicoTomedico consultas[] @relation("consultas_medicoTomedico")
@@ -62,6 +61,9 @@ model consultas {
   piora                              String?
   obs                                String?
   relatorio                          String?
+  cliente_conectado                  Boolean @default(false)
+  medico_conectado                   Boolean @default(false)
+  finalizada                         Boolean @default(false)
   cliente_consultas_clienteTocliente cliente @relation("consultas_clienteTocliente", fields: [cliente], references: [cpf], onDelete: NoAction, onUpdate: NoAction)
   medico_consultas_medicoTomedico    medico  @relation("consultas_medicoTomedico", fields: [medico], references: [cpf], onDelete: NoAction, onUpdate: NoAction)
 
@@ -71,11 +73,9 @@ model consultas {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model verificacao {
-  id                                   Int       @id @default(autoincrement())
-  cliente                              String    @db.VarChar(11)
-  data                                 DateTime? @default(now()) @db.Timestamp(6)
-  codigo                               Int
-  cliente_verificacao_clienteTocliente cliente   @relation("verificacao_clienteTocliente", fields: [cliente], references: [cpf], onDelete: NoAction, onUpdate: NoAction)
-
-  @@unique([cliente, data], map: "cli_data")
+  id     Int       @id @default(autoincrement())
+  data   DateTime? @default(now()) @db.Timestamp(6)
+  codigo String    @db.VarChar(6)
+  usado  Boolean
+  email  String
 }

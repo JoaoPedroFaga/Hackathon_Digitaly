@@ -26,7 +26,7 @@
   --bg:var(--grafite-950); --bg-elev:var(--grafite-900);
   --texto:var(--grafite-50); --texto-2:var(--grafite-300); --texto-3:var(--grafite-500);
   --marca-texto:var(--celeste-400);
-  --verde:#35D07F; --vermelho:#EF4444;
+  --verde:#35D07F; --vermelho:#EF4444; --cinza-badge:#7D8494;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -216,27 +216,35 @@ h1{
   border-color:rgba(0,159,255,.45);
   color:var(--texto);
 }
-.dia .ponto{
+.dia.consulta-finalizada{
+  background:rgba(53,208,127,.12);
+  border-color:rgba(53,208,127,.45);
+  color:var(--texto);
+}
+.dia .ponto-finalizado{
   display:block;
   width:5px;height:5px;
   border-radius:50%;
-  background:var(--celeste-400);
-  margin-top:6px;
-  box-shadow:0 0 7px rgba(0,159,255,.7);
+  background:var(--verde);
+  box-shadow:0 0 7px rgba(53,208,127,.7);
 }
 
 .legenda{
   display:flex;
-  gap:18px;
+  gap:14px;
   flex-wrap:wrap;
   margin-top:14px;
   color:var(--texto-3);
   font-size:12px;
 }
-.legenda span{display:flex;align-items:center;gap:7px}
+.legenda span{display:flex;align-items:center;gap:6px}
 .bolinha{
   width:7px;height:7px;border-radius:50%;
   background:var(--celeste-400);
+}
+.bolinha.finalizada{
+  background:var(--verde);
+  box-shadow:0 0 7px rgba(53,208,127,.7);
 }
 .bolinha.hj{border:1px solid var(--celeste-500);background:transparent}
 
@@ -265,6 +273,9 @@ h1{
   font-size:12px;
   margin-bottom:3px;
 }
+.consulta-data.finalizada{
+  color:var(--texto-3);
+}
 .consulta h3{
   font-size:15px;
   font-weight:500;
@@ -281,37 +292,15 @@ h1{
   color:var(--verde);
   margin-top:5px;
 }
+.status.finalizado{
+  color:var(--cinza-badge);
+}
 .status i{
   width:6px;height:6px;border-radius:50%;
   background:var(--verde);
 }
-.teleatendimento{
-  margin-top:20px;
-  border:1px solid rgba(53,208,127,.18);
-  background:rgba(53,208,127,.045);
-  border-radius:var(--r-lg);
-  padding:18px;
-}
-.tele-topo{
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-}
-.tele-icone{
-  width:38px;height:38px;
-  flex:0 0 38px;
-  border-radius:11px;
-  background:rgba(53,208,127,.1);
-  display:grid;
-  place-items:center;
-  color:var(--verde);
-  font-size:18px;
-}
-.tele h3{font-size:15px;font-weight:500}
-.tele p{font-size:12px;color:var(--texto-3);margin-top:2px}
-.tele .btn{
-  width:100%;
-  margin-top:14px;
+.status.finalizado i{
+  background:var(--cinza-badge);
 }
 
 /* Lateral */
@@ -363,6 +352,16 @@ h1{
   .consulta .btn{width:100%}
 }
 </style>
+
+<script>
+  const usuarioLogado = localStorage.getItem('usuarioLogado');
+  const tipoUsuario = localStorage.getItem('tipoUsuario');
+
+  if (!usuarioLogado || tipoUsuario !== 'cliente') {
+    window.location.href = 'login.html';
+  }
+</script>
+
 </head>
 
 <body>
@@ -372,7 +371,7 @@ h1{
 <header class="topo">
   <div class="topo-esquerda">
     <span class="tag"><i></i>Área do cliente</span>
-    <h1>Olá, João!</h1>
+    <h1>Olá, <span id="saudacaoNome">Cliente</span>!</h1>
     <p class="subtitulo">Acompanhe suas consultas e seus próximos atendimentos.</p>
   </div>
 </header>
@@ -384,7 +383,7 @@ h1{
       <div class="card-titulo">
         <div>
           <h2>Minhas consultas</h2>
-          <p>Confira seus atendimentos já agendados.</p>
+          <p>Confira seus atendimentos e histórico.</p>
         </div>
       </div>
 
@@ -398,10 +397,12 @@ h1{
 
       <div class="legenda">
         <span><i class="bolinha"></i> Consulta agendada</span>
+        <span><i class="bolinha finalizada"></i> Finalizada</span>
         <span><i class="bolinha hj"></i> Hoje</span>
       </div>
     </div>
 
+    <!-- Próximos Atendimentos -->
     <div class="card consultas">
       <div class="card-titulo">
         <div>
@@ -409,26 +410,21 @@ h1{
           <p>Suas consultas futuras.</p>
         </div>
       </div>
-
-      <div class="consulta">
-        <div class="consulta-info">
-          <div class="consulta-data">12 DE SETEMBRO · 14:00</div>
-          <h3>Dr. Carlos Mendes</h3>
-          <p>Consulta de acompanhamento · Teleatendimento</p>
-          <span class="status"><i></i> Agendada</span>
-        </div>
-        <button class="btn btn-secundario" onclick="entrarTeleatendimento('Carlos Mendes')">
-          Entrar na consulta
-        </button>
+      <div id="listaConsultasFuturas">
+        <p style="color:var(--texto-3);font-size:13px;padding:10px 0;">Carregando consultas...</p>
       </div>
+    </div>
 
-      <div class="consulta">
-        <div class="consulta-info">
-          <div class="consulta-data">18 DE SETEMBRO · 10:30</div>
-          <h3>Dra. Mariana Silva</h3>
-          <p>Consulta de retorno · Presencial</p>
-          <span class="status"><i></i> Agendada</span>
+    <!-- Consultas Finalizadas / Histórico -->
+    <div class="card consultas" style="margin-top: 20px;">
+      <div class="card-titulo">
+        <div>
+          <h2>Histórico de consultas</h2>
+          <p>Consultas já realizadas e resumos da IA.</p>
         </div>
+      </div>
+      <div id="listaConsultasFinalizadas">
+        <p style="color:var(--texto-3);font-size:13px;padding:10px 0;">Carregando histórico...</p>
       </div>
     </div>
   </section>
@@ -463,15 +459,15 @@ h1{
 
       <div class="info-linha">
         <span>Nome</span>
-        <span>João</span>
+        <span id="infoNome">Carregando...</span>
       </div>
       <div class="info-linha">
         <span>E-mail</span>
-        <span>joao@exemplo.com</span>
+        <span id="infoEmail">Carregando...</span>
       </div>
       <div class="info-linha">
         <span>Consultas futuras</span>
-        <span>2</span>
+        <span>0</span>
       </div>
     </div>
   </aside>
@@ -479,30 +475,10 @@ h1{
 </main>
 
 <script>
-// ============================================================
-// AUTENTICAÇÃO — DEMONSTRAÇÃO
-// ============================================================
-// Quando o login estiver integrado ao NestJS/Supabase, esta
-// verificação deve usar a sessão real do usuário.
-// Por enquanto, usamos localStorage para simular o login.
-//
-// No login real, após autenticar:
-// localStorage.setItem('usuarioLogado', 'true');
 
-//if(localStorage.getItem('usuarioLogado') !== 'true'){
-//  window.location.replace('login.html');
-//}
-
-// ============================================================
-// CALENDÁRIO
-// ============================================================
-
-const consultasAgendadas = {
-  // Exemplos de consultas já marcadas.
-  // Depois esses dados virão do NestJS/Prisma.
-  '2026-09-12': true,
-  '2026-09-18': true
-};
+const API_URL = 'https://192.168.0.111:3000';
+let consultasAtivasMap = {};       // Para datas do calendário (ativas)
+let consultasFinalizadasMap = {};  // Para datas do calendário (finalizadas)
 
 let dataCalendario = new Date();
 
@@ -514,8 +490,152 @@ const nomesMeses = [
 const nomesDias = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 
 function chaveData(ano, mes, dia){
-  return `${ano}-${String(mes + 1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+  return `${String(dia).padStart(2,'0')}/${String(mes + 1).padStart(2,'0')}/${ano}`;
 }
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const nome = localStorage.getItem('nomeUsuario');
+  const sobrenome = localStorage.getItem('sobrenomeUsuario');
+  const email = localStorage.getItem('emailUsuario');
+  const cpfLogado = localStorage.getItem('cpfUsuario');
+  
+  if (nome) {
+    const primeiroNome = nome.split(' ')[0]; 
+    document.getElementById('saudacaoNome').textContent = primeiroNome;
+    document.getElementById('infoNome').textContent = nome + " " + sobrenome;
+    document.getElementById('infoEmail').textContent = email;
+  }
+
+  try {
+    const [respostaConsultas, respostaMedicos] = await Promise.all([
+      fetch(`${API_URL}/consultas`),
+      fetch(`${API_URL}/medico`)
+    ]);
+
+    if (respostaConsultas.ok && respostaMedicos.ok) {
+      const todasConsultas = await respostaConsultas.json();
+      const todosMedicos = await respostaMedicos.json();
+      
+      const medicosPorCpf = {};
+      todosMedicos.forEach(med => {
+        medicosPorCpf[med.cpf] = med;
+      });
+
+      // Separa as consultas do cliente entre ativas e finalizadas
+      const minhasConsultas = todasConsultas.filter(c => c.cliente === cpfLogado);
+      const consultasFuturas = minhasConsultas.filter(c => !c.finalizada);
+      const consultasFinalizadas = minhasConsultas.filter(c => c.finalizada);
+      
+      // Mapeia datas para o calendário
+      consultasFuturas.forEach(c => consultasAtivasMap[c.data] = true);
+      consultasFinalizadas.forEach(c => consultasFinalizadasMap[c.data] = true);
+      
+      // Atualiza o contador de consultas futuras na barra lateral
+      document.querySelectorAll('.info-linha span')[5].textContent = consultasFuturas.length;
+
+      // 1. Renderiza Próximos Atendimentos
+      const listaFuturas = document.getElementById('listaConsultasFuturas');
+      listaFuturas.innerHTML = '';
+      
+      if (consultasFuturas.length === 0) {
+        listaFuturas.innerHTML = '<p style="color:var(--texto-3);font-size:13px;padding:10px 0;">Você não tem consultas agendadas.</p>';
+      } else {
+        consultasFuturas.forEach(consulta => {
+          const [dia, mes, ano] = consulta.data.split('/');
+          const mesNome = nomesMeses[parseInt(mes) - 1].toUpperCase();
+          const medico = medicosPorCpf[consulta.medico];
+          
+          const nomeExibicao = medico ? `Dr(a). ${medico.nome} ${medico.sobrenome}` : `Médico CPF: ${consulta.medico}`;
+          const crmExibicao = medico ? `CRM ${medico.crm}-${medico.crm_estado} · ` : '';
+
+          const medicoOnline = consulta.medico_conectado === true;
+          const statusHtml = medicoOnline 
+            ? `<span class="status" style="color: var(--verde);"><i></i> Doutor já está online!</span>`
+            : `<span class="status" style="color: var(--texto-3);"><i></i> Aguardando médico</span>`;
+
+          const card = document.createElement('div');
+          card.className = 'consulta';
+          card.innerHTML = `
+            <div class="consulta-info">
+              <div class="consulta-data">${dia} DE ${mesNome} · ${consulta.hora}</div>
+              <h3>${nomeExibicao}</h3>
+              <p>${crmExibicao}Motivo: ${consulta.motivo}</p>
+              <div id="status-consulta-${consulta.id}">${statusHtml}</div>
+            </div>
+            <button class="btn btn-secundario" onclick="window.location.href='consulta.html?id=${consulta.id}'">
+              Entrar na consulta
+            </button>
+          `;
+          listaFuturas.appendChild(card);
+        });
+
+        // Polling para atualizar status do médico nas consultas ativas
+        setInterval(async () => {
+          try {
+            const resp = await fetch(`${API_URL}/consultas`);
+            if (resp.ok) {
+              const consultasAtuais = await resp.json();
+              consultasFuturas.forEach(consultaOriginal => {
+                const atualizada = consultasAtuais.find(c => c.id === consultaOriginal.id);
+                const containerStatus = document.getElementById(`status-consulta-${consultaOriginal.id}`);
+                
+                if (atualizada && containerStatus) {
+                  const online = atualizada.medico_conectado === true;
+                  const htmlAtualizado = online 
+                    ? `<span class="status" style="color: var(--verde);"><i></i> Doutor já está online!</span>`
+                    : `<span class="status" style="color: var(--texto-3);"><i></i> Aguardando médico</span>`;
+                  
+                  if (containerStatus.innerHTML !== htmlAtualizado) {
+                    containerStatus.innerHTML = htmlAtualizado;
+                  }
+                }
+              });
+            }
+          } catch (e) {
+            console.error("Erro ao checar status:", e);
+          }
+        }, 2000);
+      }
+
+      // 2. Renderiza Histórico de Consultas Finalizadas
+      const listaFinalizadas = document.getElementById('listaConsultasFinalizadas');
+      listaFinalizadas.innerHTML = '';
+
+      if (consultasFinalizadas.length === 0) {
+        listaFinalizadas.innerHTML = '<p style="color:var(--texto-3);font-size:13px;padding:10px 0;">Nenhum histórico de consulta finalizada.</p>';
+      } else {
+        consultasFinalizadas.forEach(consulta => {
+          const [dia, mes, ano] = consulta.data.split('/');
+          const mesNome = nomesMeses[parseInt(mes) - 1].toUpperCase();
+          const medico = medicosPorCpf[consulta.medico];
+          
+          const nomeExibicao = medico ? `Dr(a). ${medico.nome} ${medico.sobrenome}` : `Médico CPF: ${consulta.medico}`;
+
+          const card = document.createElement('div');
+          card.className = 'consulta';
+          card.innerHTML = `
+            <div class="consulta-info">
+              <div class="consulta-data finalizada">${dia} DE ${mesNome} · ${consulta.hora}</div>
+              <h3>${nomeExibicao}</h3>
+              <p>Motivo: ${consulta.motivo}</p>
+              <span class="status finalizado"><i class="bolinha finalizada" style="width:6px;height:6px;display:inline-block;border-radius:50%;"></i> Consulta finalizada</span>
+            </div>
+            <button class="btn btn-secundario" onclick="window.location.href='resumo_ia.html?id=${consulta.id}'">
+              Ver resumo da IA
+            </button>
+          `;
+          listaFinalizadas.appendChild(card);
+        });
+      }
+    }
+  } catch (erro) {
+    console.error("Erro ao buscar dados: ", erro);
+    document.getElementById('listaConsultasFuturas').innerHTML = 
+      '<p style="color:var(--vermelho);font-size:13px;padding:10px 0;">Erro ao carregar as consultas.</p>';
+  }
+
+  renderizarCalendario(); 
+});
 
 function renderizarCalendario(){
   const calendario = document.getElementById('calendario');
@@ -525,7 +645,6 @@ function renderizarCalendario(){
   const mes = dataCalendario.getMonth();
 
   mesAtual.textContent = `${nomesMeses[mes]} de ${ano}`;
-
   calendario.innerHTML = '';
 
   nomesDias.forEach(nome => {
@@ -560,10 +679,13 @@ function renderizarCalendario(){
       elemento.classList.add('hoje');
     }
 
-    if(consultasAgendadas[chave]){
+    if(consultasAtivasMap[chave]){
       elemento.classList.add('consulta');
       elemento.innerHTML = `${dia}<span class="ponto"></span>`;
-    }else{
+    } else if(consultasFinalizadasMap[chave]){
+      elemento.classList.add('consulta-finalizada');
+      elemento.innerHTML = `${dia}<span class="ponto-finalizado"></span>`;
+    } else {
       elemento.textContent = dia;
     }
 
@@ -580,25 +702,6 @@ document.getElementById('mesProximo').addEventListener('click', () => {
   dataCalendario.setMonth(dataCalendario.getMonth() + 1);
   renderizarCalendario();
 });
-
-renderizarCalendario();
-
-// ============================================================
-// TELEATENDIMENTO
-// ============================================================
-
-function entrarTeleatendimento(medico){
-  // Por enquanto é apenas uma simulação.
-  // No sistema real, o NestJS verificará se:
-  // 1. o usuário está autenticado;
-  // 2. a consulta pertence a esse cliente;
-  // 3. a consulta é de teleatendimento;
-  // 4. o horário permite entrar na sala.
-  alert(`Abrindo o teleatendimento com ${medico}...`);
-
-  // Futuramente:
-  // window.location.href = 'teleatendimento.html?id=CONSULTA_ID';
-}
 </script>
 
 </body>

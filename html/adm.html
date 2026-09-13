@@ -151,7 +151,9 @@ form{
   gap:6px;
 }
 
-.campo.completo{grid-column:1 / -1}
+.campo.completo{
+  grid-column: 1 / -1;
+}
 
 .campo label{
   font-size:var(--t-sm);
@@ -329,6 +331,18 @@ form{
   .campo.completo{grid-column:auto}
 }
 </style>
+
+<script>
+  // Lê as credenciais salvas no login
+  const usuarioLogado = localStorage.getItem('usuarioLogado');
+  const tipoUsuario = localStorage.getItem('tipoUsuario');
+
+  // Se não estiver logado OU se o tipo de usuário não for 'adm', expulsa para o login
+  if (!usuarioLogado || tipoUsuario !== 'adm') {
+    window.location.href = 'login.html';
+  }
+</script>
+
 </head>
 
 <body>
@@ -358,33 +372,6 @@ form{
         <div class="formulario">
 
           <div class="campo">
-            <label for="crm">CRM</label>
-            <input type="text" id="crm" name="crm" placeholder="Ex.: 123456" maxlength="7" required>
-            <span class="ajuda" id="ajudaCRM"></span>
-          </div>
-
-          <div class="campo">
-            <label for="crm_estado">Estado do CRM</label>
-            <select id="crm_estado" name="crm_estado" required style="width:100%; height:46px; padding:0 14px; border-radius:12px; border:1px solid rgba(255,255,255,.16); background:#1B1E23; color:#F5F7FA;">
-              <option value="">UF</option>
-              <option value="SP">SP</option><option value="RJ">RJ</option><option value="MG">MG</option><option value="RS">RS</option><option value="PR">PR</option><option value="SC">SC</option><option value="BA">BA</option><option value="GO">GO</option><option value="ES">ES</option><option value="DF">DF</option><option value="PE">PE</option><option value="CE">CE</option><option value="PA">PA</option><option value="AM">AM</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="PB">PB</option><option value="RN">RN</option><option value="AL">AL</option><option value="PI">PI</option><option value="SE">SE</option><option value="RO">RO</option><option value="TO">TO</option><option value="AC">AC</option><option value="AP">AP</option><option value="RR">RR</option>
-            </select>
-            <span class="ajuda" id="ajudaEstadoCRM"></span>
-          </div>
-
-          <div class="campo">
-            <label for="cpf">CPF</label>
-            <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
-            <span class="ajuda" id="ajudaCPF"></span>
-          </div>
-
-          <div class="campo">
-            <label for="adm">CPF do Administrador</label>
-            <input type="text" id="adm" name="adm" placeholder="CPF do ADM logado" maxlength="14" required>
-            <span class="ajuda" id="ajudaADM"></span>
-          </div>
-
-          <div class="campo">
             <label for="nome">Nome</label>
             <input type="text" id="nome" name="nome" placeholder="Nome do médico" required>
             <span class="ajuda" id="ajudaNome"></span>
@@ -394,6 +381,35 @@ form{
             <label for="sobrenome">Sobrenome</label>
             <input type="text" id="sobrenome" name="sobrenome" placeholder="Sobrenome do médico" required>
             <span class="ajuda" id="ajudaSobrenome"></span>
+          </div>
+
+          <div class="campo">
+            <label for="crm">CRM</label>
+            <input type="text" id="crm" name="crm" placeholder="Ex.: 123456" maxlength="7" required>
+            <span class="ajuda" id="ajudaCRM"></span>
+          </div>
+
+          <div class="campo">
+            <label for="crm_estado">Estado do CRM</label>
+            <select id="crm_estado" name="crm_estado" required>
+              <option value="">Selecione o estado</option>
+              <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
+              <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
+              <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+              <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+              <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
+              <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
+              <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
+              <option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+              <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+            </select>
+            <span class="ajuda" id="ajudaEstadoCRM"></span>
+          </div>
+
+          <div class="campo completo">
+            <label for="cpf">CPF</label>
+            <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
+            <span class="ajuda" id="ajudaCPF"></span>
           </div>
 
           <div class="campo completo">
@@ -407,7 +423,6 @@ form{
             <input type="password" id="senha" name="senha" placeholder="Senha provisória" required>
             <span class="ajuda" id="ajudaSenha"></span>
           </div>
-
         </div>
 
         <div class="acoes">
@@ -455,7 +470,8 @@ form{
 
     <div class="card aviso">
       <strong>Painel Administrativo</strong><br>
-      Os dados salvos aqui são integrados diretamente com a API do NestJS e salvos no banco de dados.
+      Os dados salvos aqui são integrados diretamente com o banco de dados do sistema.<br>
+      Adicione apenas Médicos autorizados.
     </div>
   </aside>
 
@@ -533,11 +549,6 @@ document.getElementById('cpf').addEventListener('input', function(){
   this.value = formatarCPF(this.value);
 });
 
-document.getElementById('adm').addEventListener('input', function(){
-  this.value = formatarCPF(this.value);
-});
-
-// Envio do formulário para o NestJS
 form.addEventListener('submit', async function(e){
   e.preventDefault();
 
@@ -545,7 +556,6 @@ form.addEventListener('submit', async function(e){
     crm : document.getElementById('crm'),
     crm_estado : document.getElementById('crm_estado'),
     cpf : document.getElementById('cpf'),
-    adm : document.getElementById('adm'),
     nome : document.getElementById('nome'),
     sobrenome : document.getElementById('sobrenome'),
     email : document.getElementById('email'),
@@ -581,7 +591,7 @@ form.addEventListener('submit', async function(e){
     camposMedico.crm_estado.value !== ''
   );
 
-  const cpfMedicoNumeros = camposMedico.cpf.value.replace(/\D/g, '').replace('.','').replace('-','');
+  const cpfMedicoNumeros = camposMedico.cpf.value.replace(/\D/g, '');
   validar(
     camposMedico.cpf,
     document.getElementById('ajudaCPF'),
@@ -618,24 +628,16 @@ form.addEventListener('submit', async function(e){
     camposMedico.senha.value.length >= 8
   );
 
-  const cpfADMNumeros = camposMedico.adm.value.replace(/\D/g, '').replace('.','').replace('-','');
-  validar(
-    camposMedico.adm,
-    document.getElementById('ajudaADM'),
-    'Digite um CPF válido.',
-    cpfMedicoNumeros.length == 11
-  );
-
-
   if(valido){
-    
+    const cpfAdmLogado = (localStorage.getItem('cpfUsuario') || '').replace(/\D/g, '');
+
     const dadosMedico = {
       nome: camposMedico.nome.value.trim(),
       sobrenome: camposMedico.sobrenome.value.trim(),
       cpf: cpfMedicoNumeros,
       crm: camposMedico.crm.value.trim(),
       crm_estado: camposMedico.crm_estado.value.trim(),
-      adm: cpfADMNumeros,
+      adm: cpfAdmLogado,
       email: camposMedico.email.value.trim(),
       senha: camposMedico.senha.value,
     };

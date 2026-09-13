@@ -31,4 +31,9 @@ export class AdmController {
   remove(@Param('cpf') cpf: string) {
     return this.admService.remove(cpf);
   }
+
+  @Post('login')
+  login(@Body() credenciais: { email: string; senha: string }) {
+    return this.admService.login(credenciais.email, credenciais.senha);
+  }
 }

@@ -7,15 +7,25 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+import { TranscriptionService } from '../transcription/transcription.service.js';
+
 @WebSocketGateway({
   namespace: '/webrtc',
   cors: { origin: '*' },
 })
 export class WebrtcGateway {
+
+  constructor(
+    private readonly transcriptionService: TranscriptionService,
+  ) {}
+
   @WebSocketServer()
   server: Server;
 
   private readonly rooms = new Map<string, Set<string>>();
+
+  // Guarda o texto completo de cada sala
+  private readonly transcriptionTexts = new Map<string, string>();
 
   @SubscribeMessage('join_room')
   join(
@@ -47,6 +57,11 @@ export class WebrtcGateway {
     const room = this.rooms.get(roomId)!;
     room.add(client.id);
 
+    // Inicializa o texto da sala caso ainda não exista
+    if (!this.transcriptionTexts.has(roomId)) {
+      this.transcriptionTexts.set(roomId, '');
+    }
+
     client.emit('room_joined', {
       roomId,
       participants: room.size,
@@ -71,6 +86,88 @@ export class WebrtcGateway {
       offer: body.offer,
       from: client.id,
     });
+  }
+
+  @SubscribeMessage('audio_chunk')
+  async audioChunk(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    body: {
+      roomId: string;
+      sequence: number;
+      timestamp: number;
+      audio: Buffer;
+    },
+  ) {
+
+    const roomId = client.data.roomId;
+
+    try {
+      const text =
+        await this.transcriptionService.transcribeAudio(
+          body.audio,
+        );
+
+      if (!text) {
+        return;
+      }
+
+      // Recupera o texto que já foi transcrito nessa sala
+      const textoAnterior =
+        this.transcriptionTexts.get(roomId) ?? '\n\n';
+
+      // Concatena o novo texto
+      const textoCompleto = textoAnterior
+        ? `${textoAnterior} ${text}`
+        : text;
+
+      // Salva o texto atualizado
+      this.transcriptionTexts.set(
+        roomId,
+        textoCompleto,
+      );
+
+      console.log(
+        `[TEXTO COMPLETO] sala=${roomId}: ${textoCompleto}`,
+      );
+
+    } catch (error) {
+      console.error(
+        '❌ Erro ao enviar áudio para Whisper:',
+        error,
+      );
+    }
+  }
+
+  async processTexts(
+    roomId: string,
+    texts: string[],
+  ): Promise<string[]> {
+    const response = await fetch(
+      `${"localhost:8000"}/ai`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          roomId,
+          texts,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Erro na IA: ${response.status} - ${await response.text()}`,
+      );
+    }
+
+    const result = (await response.json()) as {
+      texts: string[];
+    };
+
+    return result.texts;
   }
 
   @SubscribeMessage('answer')
@@ -144,6 +241,9 @@ export class WebrtcGateway {
 
       if (room.size === 0) {
         this.rooms.delete(roomId);
+
+        // Remove também a transcrição acumulada
+        this.transcriptionTexts.delete(roomId);
       }
     }
 

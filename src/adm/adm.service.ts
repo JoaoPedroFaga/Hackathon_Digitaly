@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { CreateAdmDto } from './dto/create-adm.dto.js';
 import { UpdateAdmDto } from './dto/update-adm.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -41,5 +41,26 @@ export class AdmService {
     return this.prisma.adm.delete({
       where: { cpf },
     });
+  }
+
+  async login(email: string, senhaDigitada: string) {
+    // Busca o adm pelo e-mail
+    const adm = await this.prisma.adm.findFirst({
+      where: { email: email },
+    });
+
+    // Se não achar o e-mail ou a senha estiver errada, barra o acesso
+    if (!adm || adm.senha !== senhaDigitada) {
+      throw new UnauthorizedException('E-mail ou senha incorretos.');
+    }
+
+    // Se deu certo, devolve o CPF para o frontend salvar no localStorage
+    return {
+      mensagem: 'Login aprovado',
+      cpf: adm.cpf,
+      nome: "admin", 
+      sobrenome: "",
+      email: adm.email 
+    };
   }
 }
