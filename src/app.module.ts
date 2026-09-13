@@ -9,7 +9,6 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    // Transforma sua pasta 'html' na raiz do seu site
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'html'),
     }),
@@ -19,7 +18,7 @@ import { join } from 'path';
     AdmModule,
     ConsultasModule,
   ],
-  controllers: [], // Deixamos vazio, não precisamos mais do AppController
-  providers: [],   // Deixamos vazio, não precisamos mais do AppService
+  controllers: [], 
+  providers: [],   
 })
 export class AppModule {}
